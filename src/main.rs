@@ -1,7 +1,6 @@
 use unibox::stack::{
     StaticUniBox, UniBox64, UniBox128
 };
-use core::mem;
 
 #[derive(Debug)]
 #[allow(dead_code)]
@@ -16,10 +15,6 @@ impl Drop for User {
     fn drop(&mut self) {
         println!("User dropped");
     }
-}
-
-fn drop_user<T: StaticUniBox>(ubox: &T) {
-    mem::drop(ubox.as_owned::<User>());
 }
 
 #[derive(Debug)]
@@ -38,13 +33,6 @@ impl Drop for Address {
     }
 }
 
-//TODO: generate autodrop functions with a macro. Someting like:
-//#[autodrop(func_name)]
-//struct MyStruct { ... }
-fn drop_addr<T: StaticUniBox>(ubox: &T) {
-    mem::drop(ubox.as_owned::<Address>());
-}
-
 fn main() {
     let ub1 = UniBox128::new(
         User {
@@ -58,8 +46,7 @@ fn main() {
                 zip: 888888,
                 country_code: ['J' as u8, 'P' as u8]
             }
-        },
-        drop_user
+        }
     ).expect("Couldn't create UniBox128 for User");
     
     let ub2 = UniBox128::new(
@@ -69,8 +56,7 @@ fn main() {
             city: "Calella".to_owned(),
             zip: 08370,
             country_code: ['C' as u8, 'T' as u8]
-        },
-        drop_addr
+        }
     ).expect("Couldn't create UniBox128 for Address");
 
     let user_ref = ub1.as_ref::<User>();
@@ -99,8 +85,7 @@ fn main() {
             city: "Calella".to_owned(),
             zip: 08370,
             country_code: ['C' as u8, 'T' as u8]
-        },
-        drop_addr
+        }
     ).expect("Couldn't create UniBox64 for Address");
 
     println!("{:#?}", ub3.as_ref::<Address>());

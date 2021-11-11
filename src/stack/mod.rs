@@ -7,7 +7,7 @@ use core::{
 
 /// Generic trait for all static uniboxes.
 pub trait StaticUniBox {
-    fn new<T: Sized>(instance: T, autodrop: fn(&Self)) -> Result<Self, ()> where Self: Sized;
+    fn new<T: Sized>(instance: T) -> Result<Self, ()> where Self: Sized;
     fn as_ref<T: Sized>(&self) -> &T;
     fn as_owned<T: Sized>(&self) -> T;
     fn len(&self) -> usize;
@@ -24,12 +24,15 @@ impl StaticUniBox for UniBox64 {
     /// Create a new UniBox instance.
     /// 
     /// Returns Err if the struct is bigger than 64 bytes.
-    fn new<T: Sized>(instance: T, autodrop: fn(&Self)) -> Result<Self, ()> {
+    fn new<T: Sized>(instance: T) -> Result<Self, ()> {
         let bytes = unsafe {
             slice::from_raw_parts(
                 (&instance as *const T) as *const u8,
                 mem::size_of::<T>()
             )
+        };
+        let autodrop = |_self: &UniBox64| {
+            mem::drop(_self.as_owned::<T>());
         };
         let len = bytes.len();
         if len > 64 {
@@ -96,12 +99,15 @@ impl StaticUniBox for UniBox128 {
     /// Create a new UniBox instance.
     /// 
     /// Returns Err if the struct is bigger than 128 bytes.
-    fn new<T: Sized>(instance: T, autodrop: fn(&Self)) -> Result<Self, ()> {
+    fn new<T: Sized>(instance: T) -> Result<Self, ()> {
         let bytes = unsafe {
             slice::from_raw_parts(
                 (&instance as *const T) as *const u8,
                 mem::size_of::<T>()
             )
+        };
+        let autodrop = |_self: &UniBox128| {
+            mem::drop(_self.as_owned::<T>());
         };
         let len = bytes.len();
         if len > 128 {
@@ -169,12 +175,15 @@ impl StaticUniBox for UniBox256 {
     /// Create a new UniBox instance.
     /// 
     /// Returns Err if the struct is bigger than 256 bytes.
-    fn new<T: Sized>(instance: T, autodrop: fn(&Self)) -> Result<Self, ()> {
+    fn new<T: Sized>(instance: T) -> Result<Self, ()> {
         let bytes = unsafe {
             slice::from_raw_parts(
                 (&instance as *const T) as *const u8,
                 mem::size_of::<T>()
             )
+        };
+        let autodrop = |_self: &UniBox256| {
+            mem::drop(_self.as_owned::<T>());
         };
         let len = bytes.len();
         if len > 256 {
