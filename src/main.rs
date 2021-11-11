@@ -1,69 +1,5 @@
-use std::slice;
-use std::mem;
-
-struct UniBox128 {
-    data: [u8; 128],
-    len: usize,
-    autodrop: fn(&Self)
-}
-
-impl UniBox128 {
-    unsafe fn as_buf_ptr<T: Sized>(p: &T) -> &[u8] {
-        slice::from_raw_parts(
-            (p as *const T) as *const u8,
-            mem::size_of::<T>()
-        )
-    }
-    
-    pub fn new<T: Sized>(instance: T, autodrop: fn(&Self)) -> Result<Self, ()> {
-        let bytes = unsafe { Self::as_buf_ptr(&instance) };
-        let len = bytes.len();
-        
-        dbg!(len);
-        
-        if len > 128 {
-            Err(())
-        }
-        else {
-            let mut data = [0; 128];
-            data[0..len].clone_from_slice(bytes);
-            mem::forget(instance);
-            Ok(
-                Self {
-                    data,
-                    len,
-                    autodrop
-                }
-            )
-        }
-    }
-
-    pub fn as_ref<T: Sized>(&self) -> &T {
-        let len = mem::size_of::<T>();
-        if len != self.len {
-            panic!("Size of hosted data and requiered type are different");
-        }
-        unsafe {
-            mem::transmute::<&[u8; 128], &T>(&self.data)
-        }
-    }
-
-    pub fn as_owned<T: Sized>(&self) -> T {
-        let len = mem::size_of::<T>();
-        let mut buf = [0u8; 128];
-        buf[0..len].clone_from_slice(&self.data[0..len]);
-        unsafe {
-            std::ptr::read(buf.as_ptr() as *const T)
-        }
-    }
-}
-
-impl Drop for UniBox128 {
-    fn drop(&mut self) {
-        println!("UniBox128 dropped");
-        (self.autodrop)(self);
-    }
-}
+use unibox::stack::UniBox128;
+use core::mem;
 
 #[derive(Debug)]
 #[allow(dead_code)]
@@ -100,6 +36,9 @@ impl Drop for Address {
     }
 }
 
+//TODO: generate autodrop functions with a macro. Someting like:
+//#[autodrop(func_name)]
+//struct MyStruct { ... }
 fn drop_addr(ubox: &UniBox128) {
     mem::drop(ubox.as_owned::<Address>());
 }
@@ -119,7 +58,7 @@ fn main() {
             }
         },
         drop_user
-    ).unwrap();
+    ).expect("Couldn't create UniBox128 for User");
     
     let ub2 = UniBox128::new(
         Address {
@@ -130,7 +69,7 @@ fn main() {
             country_code: ['C' as u8, 'T' as u8]
         },
         drop_addr
-    ).unwrap();
+    ).expect("Couldn't create UniBox128 for Address");
 
     let user_ref = ub1.as_ref::<User>();
     let addr_ref = ub2.as_ref::<Address>();
