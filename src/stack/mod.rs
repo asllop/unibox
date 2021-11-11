@@ -31,7 +31,7 @@ impl StaticUniBox for UniBox64 {
                 mem::size_of::<T>()
             )
         };
-        let autodrop = |_self: &UniBox64| {
+        let autodrop = |_self: &Self| {
             mem::drop(_self.as_owned::<T>());
         };
         let len = bytes.len();
@@ -106,7 +106,7 @@ impl StaticUniBox for UniBox128 {
                 mem::size_of::<T>()
             )
         };
-        let autodrop = |_self: &UniBox128| {
+        let autodrop = |_self: &Self| {
             mem::drop(_self.as_owned::<T>());
         };
         let len = bytes.len();
@@ -182,7 +182,7 @@ impl StaticUniBox for UniBox256 {
                 mem::size_of::<T>()
             )
         };
-        let autodrop = |_self: &UniBox256| {
+        let autodrop = |_self: &Self| {
             mem::drop(_self.as_owned::<T>());
         };
         let len = bytes.len();
