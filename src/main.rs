@@ -16,7 +16,7 @@ impl UniBox64 {
         )
     }
     
-    pub fn from<T: Sized>(instance: T) -> Result<Self, ()> {
+    pub fn new<T: Sized>(instance: T) -> Result<Self, ()> {
         let bytes = unsafe { Self::as_buf_ptr(&instance) };
         let len = bytes.len();
         
@@ -95,7 +95,7 @@ impl Drop for Address {
 }
 
 fn main() {
-    let ub1 = UniBox64::from(
+    let ub1 = UniBox64::new(
         User {
             name: "Andreu".to_owned(),
             surname: "Santarén".to_owned(),
@@ -103,7 +103,7 @@ fn main() {
         }
     ).unwrap();
     
-    let ub2 = UniBox64::from(
+    let ub2 = UniBox64::new(
         Address {
             street: "Carrer Escoles Pies".to_owned(),
             number: 42,
@@ -132,10 +132,5 @@ fn main() {
     mem::drop(addr);
     mem::drop(user);
 
-    println!("---- Values of references after dropping structs ----");
-
-    // Pointers are no longer valid, because structs have been droped
-
-    println!("{:#?}", user_ref);
-    println!("{:#?}", addr_ref);
+    // Pointers user_ref and addr_ref are no longer valid anymore, because structs have been droped
 }
