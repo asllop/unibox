@@ -1,4 +1,6 @@
-use unibox::stack::UniBox128;
+use unibox::stack::{
+    StaticUniBox, UniBox64, UniBox128
+};
 use core::mem;
 
 #[derive(Debug)]
@@ -16,7 +18,7 @@ impl Drop for User {
     }
 }
 
-fn drop_user(ubox: &UniBox128) {
+fn drop_user<T: StaticUniBox>(ubox: &T) {
     mem::drop(ubox.as_owned::<User>());
 }
 
@@ -39,7 +41,7 @@ impl Drop for Address {
 //TODO: generate autodrop functions with a macro. Someting like:
 //#[autodrop(func_name)]
 //struct MyStruct { ... }
-fn drop_addr(ubox: &UniBox128) {
+fn drop_addr<T: StaticUniBox>(ubox: &T) {
     mem::drop(ubox.as_owned::<Address>());
 }
 
@@ -79,16 +81,29 @@ fn main() {
     println!("{:#?}", user_ref);
     println!("{:#?}", addr_ref);
 
-    // println!("---- Owned structs ----");
+    println!("---- Vector of UniBoxes ----");
 
-    // let user = ub1.as_owned::<User>();
-    // let addr = ub2.as_owned::<Address>();
+    let v = vec!(ub1, ub2);
 
-    // println!("{:#?}", user);
-    // println!("{:#?}", addr);
+    for b in v.iter() {
+        println!("UniBox len = {}", b.len());
+    }
 
-    // mem::drop(addr);
-    // mem::drop(user);
+    println!("---- Create 64 bytes unibox ----");
 
-    // Pointers user_ref and addr_ref are no longer valid anymore, because structs have been droped
+    // Create a smaller piece
+    let ub3 = UniBox64::new(
+        Address {
+            street: "Carrer Escoles Pies".to_owned(),
+            number: 42,
+            city: "Calella".to_owned(),
+            zip: 08370,
+            country_code: ['C' as u8, 'T' as u8]
+        },
+        drop_addr
+    ).expect("Couldn't create UniBox64 for Address");
+
+    println!("{:#?}", ub3.as_ref::<Address>());
+
+    println!("---- Finish and drop all ----");
 }
