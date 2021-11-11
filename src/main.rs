@@ -19,7 +19,9 @@ impl UniBox64 {
     pub fn from<T: Sized>(instance: T) -> Result<Self, ()> {
         let bytes = unsafe { Self::as_buf_ptr(&instance) };
         let len = bytes.len();
-        println!("Size = {}", len);
+        
+        dbg!(len);
+        
         if len > 64 {
             Err(())
         }
@@ -46,14 +48,13 @@ impl UniBox64 {
         }
     }
 
-    pub fn as_owned<T: Sized>(&self, host: T) -> T {
+    pub fn as_owned<T: Sized>(&self) -> T {
         let len = mem::size_of::<T>();
-        if len != self.len {
-            panic!("Size of hosted data and requiered type are different");
+        let mut buf = [0u8; 64];
+        buf[0..len].clone_from_slice(&self.data[0..len]);
+        unsafe {
+            std::ptr::read(buf.as_ptr() as *const T)
         }
-        let host_ref = unsafe { &mut *(Self::as_buf_ptr(&host) as *const [u8] as *mut [u8]) };
-        host_ref.clone_from_slice(&self.data[0..len]);
-        host
     }
 }
 
@@ -71,17 +72,6 @@ struct User {
     pub age: u8
 }
 
-impl User {
-    fn empty() -> Self {
-        Self {
-            name: String::new(),
-            surname: String::new(),
-            age: 0
-        }
-    }
-}
-
-
 impl Drop for User {
     fn drop(&mut self) {
         println!("User dropped");
@@ -96,18 +86,6 @@ struct Address {
     pub city: String,
     pub zip: u32,
     pub country_code: [u8; 2]
-}
-
-impl Address {
-    fn empty() -> Self {
-        Self {
-            street: String::new(),
-            number: 0,
-            city: String::new(),
-            zip: 0,
-            country_code: [0; 2]
-        }
-    }
 }
 
 impl Drop for Address {
@@ -138,14 +116,26 @@ fn main() {
     let user_ref = ub1.as_ref::<User>();
     let addr_ref = ub2.as_ref::<Address>();
 
+    println!("---- Reference to structs ----");
+
     println!("{:#?}", user_ref);
     println!("{:#?}", addr_ref);
 
-    println!("------------------------------------------");
+    println!("---- Owned structs ----");
 
-    let user = ub1.as_owned::<User>(User::empty());
-    let addr = ub2.as_owned::<Address>(Address::empty());
+    let user = ub1.as_owned::<User>();
+    let addr = ub2.as_owned::<Address>();
 
     println!("{:#?}", user);
     println!("{:#?}", addr);
+
+    mem::drop(addr);
+    mem::drop(user);
+
+    println!("---- Values of references after dropping structs ----");
+
+    // Pointers are no longer valid, because structs have been droped
+
+    println!("{:#?}", user_ref);
+    println!("{:#?}", addr_ref);
 }
