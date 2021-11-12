@@ -4,30 +4,7 @@ use core::{
     ptr,
     ops::Drop
 };
-
-/// Generic trait for all static uniboxes.
-pub trait StaticUniBox {
-    /// Create a new UniBox instance.
-    /// 
-    /// Returns Err if the struct is bigger than N bytes (N being the size of the unibox).
-    fn new<T: Sized>(instance: T) -> Result<Self, ()> where Self: Sized {
-        Self::new_with_id(instance, 0)
-    }
-    /// Create a new UniBox instance.
-    /// 
-    /// Accepts an *instance* and an *id*: a custom defined identifier used to know what type lies inside.
-    /// 
-    /// Returns Err if the struct is bigger than N bytes (N being the size of the unibox).
-    fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized;
-    /// Get reference to stored data using a type.
-    /// 
-    /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic or any undefined behavior.
-    unsafe fn as_ref<T: Sized>(&self) -> &T;
-    /// Stored data length.
-    fn len(&self) -> usize;
-    /// Type identifier.
-    fn id(&self) -> usize;
-}
+use super::Uniboxed;
 
 /// Interface for supported buffer types.
 /// 
@@ -223,7 +200,7 @@ pub struct UniBox32 {
     unibox: UniBoxN<[u8; 32]>
 }
 
-impl StaticUniBox for UniBox32 {
+impl Uniboxed for UniBox32 {
     fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
         Ok(
             Self {
@@ -250,7 +227,7 @@ pub struct UniBox64 {
     unibox: UniBoxN<[u8; 64]>
 }
 
-impl StaticUniBox for UniBox64 {
+impl Uniboxed for UniBox64 {
     fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
         Ok(
             Self {
@@ -277,7 +254,7 @@ pub struct UniBox128 {
     unibox: UniBoxN<[u8; 128]>
 }
 
-impl StaticUniBox for UniBox128 {
+impl Uniboxed for UniBox128 {
     fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
         Ok(
             Self {
@@ -304,7 +281,7 @@ pub struct UniBox256 {
     unibox: UniBoxN<[u8; 256]>
 }
 
-impl StaticUniBox for UniBox256 {
+impl Uniboxed for UniBox256 {
     fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
         Ok(
             Self {

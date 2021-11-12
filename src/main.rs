@@ -1,5 +1,5 @@
 use unibox::{
-    StaticUniBox, UniBox64, UniBox128
+    Uniboxed, UniBox64, UniBox128, UniBox
 };
 
 #[derive(Debug)]
@@ -94,6 +94,36 @@ fn main() {
     ).expect("Couldn't create UniBox64 for Address");
 
     println!("{:#?}", unsafe { ub3.as_ref::<Address>() });
+
+    println!("---- Create dynamic uniboxes ----");
+
+    let ub4 = UniBox::new(
+Address {
+            street: "Carrer de l'Església".to_owned(),
+            number: 203,
+            city: "Calella".to_owned(),
+            zip: 08370,
+            country_code: ['C' as u8, 'T' as u8]
+        }
+    ).expect("Couldn't create dynamic UniBox for Address");
+
+    let ub5 = UniBox::new(
+User {
+            name: "Andreu".to_owned(),
+            surname: "Llop".to_owned(),
+            age: 37,
+            address: Address {
+                street: "Carrer del Julivert".to_owned(),
+                number: 101,
+                city: "Vila del Pingüí".to_owned(),
+                zip: 888888,
+                country_code: ['A' as u8, 'D' as u8]
+            }
+        }
+    ).expect("Couldn't create dynamic UniBox for User");
+
+    println!("{:#?}", unsafe { ub4.as_ref::<Address>() });
+    println!("{:#?}", unsafe { ub5.as_ref::<User>() });
 
     println!("---- Finish and drop all ----");
 }

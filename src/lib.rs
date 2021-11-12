@@ -29,7 +29,7 @@
 //! We can use static uniboxes like this:
 //! 
 //! ```
-//! use unibox::{ StaticUniBox, UniBox64 };
+//! use unibox::{ Uniboxed, UniBox64 };
 //! 
 //! #[derive(Debug)]
 //! struct BornDate {
@@ -100,3 +100,23 @@ pub use heap::*;
 
 mod stack;
 pub use stack::*;
+
+/// Generic trait for all uniboxes.
+pub trait Uniboxed {
+    /// Create a new UniBox instance.
+    fn new<T: Sized>(instance: T) -> Result<Self, ()> where Self: Sized {
+        Self::new_with_id(instance, 0)
+    }
+    /// Create a new UniBox instance.
+    /// 
+    /// Accepts an *instance* and an *id*: a custom defined identifier used to know what type lies inside.
+    fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized;
+    /// Get reference to stored data using a type.
+    /// 
+    /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic or any undefined behavior.
+    unsafe fn as_ref<T: Sized>(&self) -> &T;
+    /// Stored data length.
+    fn len(&self) -> usize;
+    /// Type identifier.
+    fn id(&self) -> usize;
+}
