@@ -12,7 +12,9 @@ pub trait StaticUniBox {
     /// Returns Err if the struct is bigger than N bytes (N being the size of the unibox).
     fn new<T: Sized>(instance: T) -> Result<Self, ()> where Self: Sized;
     /// Get reference to stored data using a type.
-    fn as_ref<T: Sized>(&self) -> &T;
+    /// 
+    /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic.
+    unsafe fn as_ref<T: Sized>(&self) -> &T;
     /// Stored data length.
     fn len(&self) -> usize;
 }
@@ -181,7 +183,7 @@ impl StaticUniBox for UniBox64 {
         )
     }
 
-    fn as_ref<T: Sized>(&self) -> &T {
+    unsafe fn as_ref<T: Sized>(&self) -> &T {
         self.unibox.as_ref()
     }
 
@@ -204,7 +206,7 @@ impl StaticUniBox for UniBox128 {
         )
     }
 
-    fn as_ref<T: Sized>(&self) -> &T {
+    unsafe fn as_ref<T: Sized>(&self) -> &T {
         self.unibox.as_ref()
     }
 
@@ -227,7 +229,7 @@ impl StaticUniBox for UniBox256 {
         )
     }
 
-    fn as_ref<T: Sized>(&self) -> &T {
+    unsafe fn as_ref<T: Sized>(&self) -> &T {
         self.unibox.as_ref()
     }
 

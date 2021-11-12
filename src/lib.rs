@@ -16,5 +16,8 @@
 //! - Store mixed data in collections.
 //! 
 
-pub mod heap;
-pub mod stack;
+mod heap;
+pub use heap::*;
+
+mod stack;
+pub use stack::*;

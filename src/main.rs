@@ -1,4 +1,4 @@
-use unibox::stack::{
+use unibox::{
     StaticUniBox, UniBox64, UniBox128
 };
 
@@ -59,8 +59,8 @@ fn main() {
         }
     ).expect("Couldn't create UniBox128 for Address");
 
-    let user_ref = ub1.as_ref::<User>();
-    let addr_ref = ub2.as_ref::<Address>();
+    let user_ref = unsafe { ub1.as_ref::<User>() };
+    let addr_ref = unsafe { ub2.as_ref::<Address>() };
 
     println!("---- Reference to structs ----");
 
@@ -88,7 +88,7 @@ fn main() {
         }
     ).expect("Couldn't create UniBox64 for Address");
 
-    println!("{:#?}", ub3.as_ref::<Address>());
+    println!("{:#?}", unsafe { ub3.as_ref::<Address>() });
 
     println!("---- Finish and drop all ----");
 }
