@@ -155,7 +155,7 @@ impl<S: Buffer> UniBoxN<S> {
             )
         };
         let autodrop = |_self: &Self| {
-            mem::drop(_self.as_owned::<T>());
+            mem::drop(unsafe { _self.as_owned::<T>() });
         };
         let len = bytes.len();
         if len > S::len() {
@@ -179,29 +179,25 @@ impl<S: Buffer> UniBoxN<S> {
     /// Get reference to stored data using a type.
     /// 
     /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic or any undefined behavior.
-    pub fn as_ref<T: Sized>(&self) -> &T {
+    pub unsafe fn as_ref<T: Sized>(&self) -> &T {
         let len = mem::size_of::<T>();
         if len != self.len {
             panic!("Size of hosted data and requiered type are different");
         }
-        unsafe {
-            mem::transmute::<&S, &T>(&self.data)
-        }
+        mem::transmute::<&S, &T>(&self.data)
     }
 
     /// Get owned internal type.
     /// 
     /// **WARNING**: After calling this method, the internal buffer may contain invalid data and must not be used anymore.
-    pub fn as_owned<T: Sized>(&self) -> T {
+    pub unsafe fn as_owned<T: Sized>(&self) -> T {
         let len = mem::size_of::<T>();
         if len != self.len {
             panic!("Size of hosted data and requiered type are different");
         }
         let mut buf = S::init();
         buf.copy_from_type(&self.data, len);
-        unsafe {
-            ptr::read(buf.ptr())
-        }
+        ptr::read(buf.ptr())
     }
 
     /// Stored data length.
