@@ -34,6 +34,9 @@ impl Drop for Address {
 }
 
 fn main() {
+    const ADDR_ID : usize = 1;
+    const USER_ID : usize = 2;
+
     let ub1 = UniBox128::new(
         User {
             name: "Andreu".to_owned(),
@@ -46,7 +49,8 @@ fn main() {
                 zip: 888888,
                 country_code: ['J' as u8, 'P' as u8]
             }
-        }
+        },
+        USER_ID
     ).expect("Couldn't create UniBox128 for User");
     
     let ub2 = UniBox128::new(
@@ -56,7 +60,8 @@ fn main() {
             city: "Calella".to_owned(),
             zip: 08370,
             country_code: ['C' as u8, 'T' as u8]
-        }
+        },
+        ADDR_ID
     ).expect("Couldn't create UniBox128 for Address");
 
     let user_ref = unsafe { ub1.as_ref::<User>() };
@@ -85,7 +90,8 @@ fn main() {
             city: "Calella".to_owned(),
             zip: 08370,
             country_code: ['C' as u8, 'T' as u8]
-        }
+        },
+        ADDR_ID
     ).expect("Couldn't create UniBox64 for Address");
 
     println!("{:#?}", unsafe { ub3.as_ref::<Address>() });

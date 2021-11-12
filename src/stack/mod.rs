@@ -9,14 +9,18 @@ use core::{
 pub trait StaticUniBox {
     /// Create a new UniBox instance.
     /// 
+    /// Accepts the instance and a Type Identifier: a custom defined ID used to know what lies inside.
+    /// 
     /// Returns Err if the struct is bigger than N bytes (N being the size of the unibox).
-    fn new<T: Sized>(instance: T) -> Result<Self, ()> where Self: Sized;
+    fn new<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized;
     /// Get reference to stored data using a type.
     /// 
     /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic.
     unsafe fn as_ref<T: Sized>(&self) -> &T;
     /// Stored data length.
     fn len(&self) -> usize;
+    /// Type identifier.
+    fn id(&self) -> usize;
 }
 
 /// Interface for supported array types.
@@ -103,11 +107,12 @@ impl Slice for [u8; 256] {
 pub struct UniBoxN<S: Slice> {
     data: S,
     len: usize,
-    autodrop: fn(&Self)
+    autodrop: fn(&Self),
+    id: usize
 }
 
 impl<S: Slice> UniBoxN<S> {
-    pub fn new<T: Sized>(instance: T) -> Result<Self, ()> {
+    pub fn new<T: Sized>(instance: T, id: usize) -> Result<Self, ()> {
         let bytes = unsafe {
             slice::from_raw_parts(
                 (&instance as *const T) as *const u8,
@@ -129,7 +134,8 @@ impl<S: Slice> UniBoxN<S> {
                 Self {
                     data,
                     len,
-                    autodrop
+                    autodrop,
+                    id
                 }
             )
         }
@@ -160,6 +166,10 @@ impl<S: Slice> UniBoxN<S> {
     pub fn len(&self) -> usize {
         self.len
     }
+
+    pub fn id(&self) -> usize {
+        self.id
+    }
 }
 
 impl<S: Slice> Drop for UniBoxN<S> {
@@ -175,10 +185,10 @@ pub struct UniBox64 {
 }
 
 impl StaticUniBox for UniBox64 {
-    fn new<T: Sized>(instance: T) -> Result<Self, ()> where Self: Sized {
+    fn new<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
         Ok(
             Self {
-                unibox: UniBoxN::new(instance)?
+                unibox: UniBoxN::new(instance, id)?
             }
         )
     }
@@ -189,6 +199,10 @@ impl StaticUniBox for UniBox64 {
 
     fn len(&self) -> usize {
         self.unibox.len()
+    }
+
+    fn id(&self) -> usize {
+        self.unibox.id()
     }
 }
 
@@ -198,10 +212,10 @@ pub struct UniBox128 {
 }
 
 impl StaticUniBox for UniBox128 {
-    fn new<T: Sized>(instance: T) -> Result<Self, ()> where Self: Sized {
+    fn new<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
         Ok(
             Self {
-                unibox: UniBoxN::new(instance)?
+                unibox: UniBoxN::new(instance, id)?
             }
         )
     }
@@ -212,6 +226,10 @@ impl StaticUniBox for UniBox128 {
 
     fn len(&self) -> usize {
         self.unibox.len()
+    }
+
+    fn id(&self) -> usize {
+        self.unibox.id()
     }
 }
 
@@ -221,10 +239,10 @@ pub struct UniBox256 {
 }
 
 impl StaticUniBox for UniBox256 {
-    fn new<T: Sized>(instance: T) -> Result<Self, ()> where Self: Sized {
+    fn new<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
         Ok(
             Self {
-                unibox: UniBoxN::new(instance)?
+                unibox: UniBoxN::new(instance, id)?
             }
         )
     }
@@ -235,5 +253,9 @@ impl StaticUniBox for UniBox256 {
 
     fn len(&self) -> usize {
         self.unibox.len()
+    }
+
+    fn id(&self) -> usize {
+        self.unibox.id()
     }
 }
