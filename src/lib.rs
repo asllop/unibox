@@ -17,11 +17,16 @@
 //! - Return a reference to any type.
 //! - Be used to store mixed data in collections.
 //! 
+//! The crate offers two kinds of types:
+//! 
+//! - Static: uniboxes that store data without using heap memory. Currently are [`UniBox64`], [`UniBox128`] and [`UniBox256`].
+//! - Dynamic: store data by allocating memory, like a regular Box. There is only one type, [`UniBox`].
+//! 
 //! ## Usage
 //! 
 //! Suppose we have 2 different structs with few or nothing in commond, User and Server. And we want to store instances of these types in the same collection.
 //! 
-//! We can use UniBox like this:
+//! We can use static uniboxes like this:
 //! 
 //! ```
 //! use unibox::{ StaticUniBox, UniBox64 };

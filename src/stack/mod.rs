@@ -120,6 +120,11 @@ pub struct UniBoxN<S: Buffer> {
 }
 
 impl<S: Buffer> UniBoxN<S> {
+    /// Create a new UniBox instance.
+    /// 
+    /// Accepts an *instance* and an *id*: a custom defined identifier used to know what type lies inside.
+    /// 
+    /// Returns Err if the struct is bigger than N bytes (N being the size of the unibox).
     pub fn new<T: Sized>(instance: T, id: usize) -> Result<Self, ()> {
         let bytes = unsafe {
             slice::from_raw_parts(
@@ -149,6 +154,9 @@ impl<S: Buffer> UniBoxN<S> {
         }
     }
 
+    /// Get reference to stored data using a type.
+    /// 
+    /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic or any undefined behavior.
     pub fn as_ref<T: Sized>(&self) -> &T {
         let len = mem::size_of::<T>();
         if len != self.len {
@@ -159,6 +167,9 @@ impl<S: Buffer> UniBoxN<S> {
         }
     }
 
+    /// Get owned internal type.
+    /// 
+    /// **WARNING**: After calling this method, the internal buffer may contain invalid data and must not be used anymore.
     pub fn as_owned<T: Sized>(&self) -> T {
         let len = mem::size_of::<T>();
         if len != self.len {
@@ -171,10 +182,12 @@ impl<S: Buffer> UniBoxN<S> {
         }
     }
 
+    /// Stored data length.
     pub fn len(&self) -> usize {
         self.len
     }
 
+    /// Type identifier.
     pub fn id(&self) -> usize {
         self.id
     }
