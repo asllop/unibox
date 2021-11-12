@@ -193,7 +193,7 @@ impl<S: Buffer> Drop for UniBoxN<S> {
     }
 }
 
-/// Store a struct on stack with a max size of 32 bytes.
+/// Store a type on stack with a max size of 32 bytes.
 pub struct UniBox32 {
     unibox: UniBoxN<[u8; 32]>
 }
@@ -220,7 +220,7 @@ impl Uniboxed for UniBox32 {
     }
 }
 
-/// Store a struct on stack with a max size of 64 bytes.
+/// Store a type on stack with a max size of 64 bytes.
 pub struct UniBox64 {
     unibox: UniBoxN<[u8; 64]>
 }
@@ -247,7 +247,7 @@ impl Uniboxed for UniBox64 {
     }
 }
 
-/// Store a struct on stack with a max size of 128 bytes.
+/// Store a type on stack with a max size of 128 bytes.
 pub struct UniBox128 {
     unibox: UniBoxN<[u8; 128]>
 }
@@ -274,7 +274,7 @@ impl Uniboxed for UniBox128 {
     }
 }
 
-/// Store a struct on stack with a max size of 256 bytes.
+/// Store a type on stack with a max size of 256 bytes.
 pub struct UniBox256 {
     unibox: UniBoxN<[u8; 256]>
 }

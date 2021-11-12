@@ -8,7 +8,7 @@ use core::{
 };
 use super::Uniboxed;
 
-/// Store a struct on heap.
+/// Store a type on heap.
 pub struct UniBox {
     buffer: *mut u8,
     layout: Layout,
