@@ -162,7 +162,7 @@ impl<S: Slice> UniBoxN<S> {
 
 impl<S: Slice> Drop for UniBoxN<S> {
     fn drop(&mut self) {
-        println!("UniBoxN dropped");
+        println!("UniBoxN({}) dropped", S::len());
         (self.autodrop)(self);
     }
 }
@@ -190,12 +190,6 @@ impl StaticUniBox for UniBox64 {
     }
 }
 
-impl Drop for UniBox64 {
-    fn drop(&mut self) {
-        println!("UniBox64 dropped");
-    }
-}
-
 /// Store a struct on stack with a max size of 128 bytes.
 pub struct UniBox128 {
     unibox: UniBoxN<[u8; 128]>
@@ -219,12 +213,6 @@ impl StaticUniBox for UniBox128 {
     }
 }
 
-impl Drop for UniBox128 {
-    fn drop(&mut self) {
-        println!("UniBox128 dropped");
-    }
-}
-
 /// Store a struct on stack with a max size of 256 bytes.
 pub struct UniBox256 {
     unibox: UniBoxN<[u8; 256]>
@@ -245,11 +233,5 @@ impl StaticUniBox for UniBox256 {
 
     fn len(&self) -> usize {
         self.unibox.len()
-    }
-}
-
-impl Drop for UniBox256 {
-    fn drop(&mut self) {
-        println!("UniBox256 dropped");
     }
 }
