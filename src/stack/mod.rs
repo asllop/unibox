@@ -45,6 +45,28 @@ pub trait Buffer {
     fn copy_from_type(&mut self, src: &Self, len: usize);
 }
 
+impl Buffer for [u8; 32] {
+    fn init() -> Self {
+        [0; 32]
+    }
+
+    fn len() -> usize {
+        32
+    }
+
+    fn ptr<T>(&self) -> *const T {
+        self.as_ptr() as *const T
+    }
+
+    fn copy_from_byte(&mut self, src: &[u8], len: usize) {
+        self[0..len].clone_from_slice(src);
+    }
+
+    fn copy_from_type(&mut self, src: &Self, len: usize) {
+        self[0..len].clone_from_slice(&src[0..len]);
+    }
+}
+
 impl Buffer for [u8; 64] {
     fn init() -> Self {
         [0; 64]
@@ -197,6 +219,33 @@ impl<S: Buffer> Drop for UniBoxN<S> {
     fn drop(&mut self) {
         println!("UniBoxN({}) dropped", S::len());
         (self.autodrop)(self);
+    }
+}
+
+/// Store a struct on stack with a max size of 32 bytes.
+pub struct UniBox32 {
+    unibox: UniBoxN<[u8; 32]>
+}
+
+impl StaticUniBox for UniBox32 {
+    fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
+        Ok(
+            Self {
+                unibox: UniBoxN::new(instance, id)?
+            }
+        )
+    }
+
+    unsafe fn as_ref<T: Sized>(&self) -> &T {
+        self.unibox.as_ref()
+    }
+
+    fn len(&self) -> usize {
+        self.unibox.len()
+    }
+
+    fn id(&self) -> usize {
+        self.unibox.id()
     }
 }
 

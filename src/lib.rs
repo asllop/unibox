@@ -19,7 +19,7 @@
 //! 
 //! The crate offers two kinds of types:
 //! 
-//! - Static: uniboxes that store data without using heap memory. Currently are [`UniBox64`], [`UniBox128`] and [`UniBox256`].
+//! - Static: uniboxes that store data without using heap memory. Currently are [`UniBox32`], [`UniBox64`], [`UniBox128`] and [`UniBox256`].
 //! - Dynamic: store data by allocating memory, like a regular Box. There is only one type, [`UniBox`].
 //! 
 //! ## Usage
