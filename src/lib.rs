@@ -120,3 +120,5 @@ pub trait Uniboxed {
     /// Type identifier.
     fn id(&self) -> usize;
 }
+
+//TODO: write tests

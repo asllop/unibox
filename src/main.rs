@@ -34,6 +34,58 @@ impl Drop for Address {
 }
 
 fn main() {
+    let mut line = String::new();
+    println!("Press enter to start...");
+    std::io::stdin().read_line(&mut line).unwrap_or_default();
+ 
+    loop {
+        let x = UniBox128::new(
+            User {
+                name: "Andreu".to_owned(),
+                surname: "Llop".to_owned(),
+                age: 37,
+                address: Address {
+                    street: "Carrer del Julivert".to_owned(),
+                    number: 101,
+                    city: "Vila del Pingüí".to_owned(),
+                    zip: 888888,
+                    country_code: ['A' as u8, 'D' as u8]
+                }
+            }
+        ).expect("Couldn't create UniBox128 for User");
+        
+        let y = UniBox128::new(
+            Address {
+                street: "Sense Nom".to_owned(),
+                number: 666,
+                city: "Infern".to_owned(),
+                zip: 55555,
+                country_code: ['C' as u8, 'T' as u8]
+            }
+        ).expect("Couldn't create UniBox128 for Address");
+
+        let z = UniBox::new(
+    User {
+                name: "Andreu".to_owned(),
+                surname: "Llop".to_owned(),
+                age: 37,
+                address: Address {
+                    street: "Carrer del Julivert".to_owned(),
+                    number: 101,
+                    city: "Vila del Pingüí".to_owned(),
+                    zip: 888888,
+                    country_code: ['A' as u8, 'D' as u8]
+                }
+            }
+        ).expect("Couldn't create dynamic UniBox for User");
+
+        core::mem::drop(x);
+        core::mem::drop(y);
+        core::mem::drop(z);
+    }
+}
+
+fn _main() {
     const ADDR_ID : usize = 1;
     const USER_ID : usize = 2;
 
