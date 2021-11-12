@@ -33,7 +33,7 @@ impl Drop for Address {
     }
 }
 
-fn main() {
+fn _main() {
     let mut line = String::new();
     println!("Press enter to start...");
     std::io::stdin().read_line(&mut line).unwrap_or_default();
@@ -85,7 +85,7 @@ fn main() {
     }
 }
 
-fn _main() {
+fn main() {
     const ADDR_ID : usize = 1;
     const USER_ID : usize = 2;
 

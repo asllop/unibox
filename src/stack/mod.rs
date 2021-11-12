@@ -172,9 +172,7 @@ impl<S: Buffer> UniBoxN<S> {
         if len != self.len {
             panic!("Size of hosted data and requiered type are different");
         }
-        let mut buf = S::init();
-        buf.copy_from_type(&self.data, len);
-        ptr::read(buf.ptr())
+        ptr::read(self.data.ptr() as *const T)
     }
 
     /// Stored data length.
