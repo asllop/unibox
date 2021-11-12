@@ -15,13 +15,13 @@ pub trait StaticUniBox {
     }
     /// Create a new UniBox instance.
     /// 
-    /// Accepts the instance and a Type Identifier: a custom defined ID used to know what lies inside.
+    /// Accepts an *instance* and an *id*: a custom defined identifier used to know what type lies inside.
     /// 
     /// Returns Err if the struct is bigger than N bytes (N being the size of the unibox).
     fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized;
     /// Get reference to stored data using a type.
     /// 
-    /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic.
+    /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic or any undefined behavior.
     unsafe fn as_ref<T: Sized>(&self) -> &T;
     /// Stored data length.
     fn len(&self) -> usize;
@@ -29,8 +29,10 @@ pub trait StaticUniBox {
     fn id(&self) -> usize;
 }
 
-/// Interface for supported array types.
-pub trait Slice {
+/// Interface for supported buffer types.
+/// 
+/// The internal buffer of all uniboxes must implement this trait.
+pub trait Buffer {
     /// Init the type.
     fn init() -> Self;
     /// Type length.
@@ -43,7 +45,7 @@ pub trait Slice {
     fn copy_from_type(&mut self, src: &Self, len: usize);
 }
 
-impl Slice for [u8; 64] {
+impl Buffer for [u8; 64] {
     fn init() -> Self {
         [0; 64]
     }
@@ -65,7 +67,7 @@ impl Slice for [u8; 64] {
     }
 }
 
-impl Slice for [u8; 128] {
+impl Buffer for [u8; 128] {
     fn init() -> Self {
         [0; 128]
     }
@@ -87,7 +89,7 @@ impl Slice for [u8; 128] {
     }
 }
 
-impl Slice for [u8; 256] {
+impl Buffer for [u8; 256] {
     fn init() -> Self {
         [0; 256]
     }
@@ -109,15 +111,15 @@ impl Slice for [u8; 256] {
     }
 }
 
-/// Generic static unibox that can implement any Slice.
-pub struct UniBoxN<S: Slice> {
+/// Generic static unibox that can implement any [`Buffer`].
+pub struct UniBoxN<S: Buffer> {
     data: S,
     len: usize,
     autodrop: fn(&Self),
     id: usize
 }
 
-impl<S: Slice> UniBoxN<S> {
+impl<S: Buffer> UniBoxN<S> {
     pub fn new<T: Sized>(instance: T, id: usize) -> Result<Self, ()> {
         let bytes = unsafe {
             slice::from_raw_parts(
@@ -178,7 +180,7 @@ impl<S: Slice> UniBoxN<S> {
     }
 }
 
-impl<S: Slice> Drop for UniBoxN<S> {
+impl<S: Buffer> Drop for UniBoxN<S> {
     fn drop(&mut self) {
         println!("UniBoxN({}) dropped", S::len());
         (self.autodrop)(self);

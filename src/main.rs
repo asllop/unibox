@@ -40,14 +40,14 @@ fn main() {
     let ub1 = UniBox128::new_with_id(
         User {
             name: "Andreu".to_owned(),
-            surname: "Santarén".to_owned(),
+            surname: "Llop".to_owned(),
             age: 37,
             address: Address {
-                street: "Plaça piruleta".to_owned(),
+                street: "Carrer del Julivert".to_owned(),
                 number: 101,
                 city: "Vila del Pingüí".to_owned(),
                 zip: 888888,
-                country_code: ['J' as u8, 'P' as u8]
+                country_code: ['A' as u8, 'D' as u8]
             }
         },
         USER_ID
@@ -55,10 +55,10 @@ fn main() {
     
     let ub2 = UniBox128::new_with_id(
         Address {
-            street: "Carrer Escoles Pies".to_owned(),
-            number: 42,
-            city: "Calella".to_owned(),
-            zip: 08370,
+            street: "Sense Nom".to_owned(),
+            number: 666,
+            city: "Infern".to_owned(),
+            zip: 55555,
             country_code: ['C' as u8, 'T' as u8]
         },
         ADDR_ID
@@ -85,8 +85,8 @@ fn main() {
     // Create a smaller piece
     let ub3 = UniBox64::new(
         Address {
-            street: "Carrer Escoles Pies".to_owned(),
-            number: 42,
+            street: "Carrer de l'Església".to_owned(),
+            number: 203,
             city: "Calella".to_owned(),
             zip: 08370,
             country_code: ['C' as u8, 'T' as u8]
