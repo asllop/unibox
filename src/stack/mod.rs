@@ -9,7 +9,7 @@ use core::{
 pub trait StaticUniBox {
     /// Create a new UniBox instance.
     /// 
-    /// Returns Err if the struct is bigger than N bytes.
+    /// Returns Err if the struct is bigger than N bytes (N being the size of the unibox).
     fn new<T: Sized>(instance: T) -> Result<Self, ()> where Self: Sized;
     /// Get reference to stored data using a type.
     fn as_ref<T: Sized>(&self) -> &T;
@@ -19,10 +19,15 @@ pub trait StaticUniBox {
 
 /// Interface for supported array types.
 pub trait Slice {
+    /// Init the type.
     fn init() -> Self;
+    /// Type length.
     fn len() -> usize;
+    /// Raw pointer to type.
     fn ptr<T>(&self) -> *const T;
+    /// Copy from byte array to type *len* bytes.
     fn copy_from_byte(&mut self, src: &[u8], len: usize);
+    /// Copy from type to type *len* bytes.
     fn copy_from_type(&mut self, src: &Self, len: usize);
 }
 
