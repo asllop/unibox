@@ -9,10 +9,16 @@ use core::{
 pub trait StaticUniBox {
     /// Create a new UniBox instance.
     /// 
+    /// Returns Err if the struct is bigger than N bytes (N being the size of the unibox).
+    fn new<T: Sized>(instance: T) -> Result<Self, ()> where Self: Sized {
+        Self::new_with_id(instance, 0)
+    }
+    /// Create a new UniBox instance.
+    /// 
     /// Accepts the instance and a Type Identifier: a custom defined ID used to know what lies inside.
     /// 
     /// Returns Err if the struct is bigger than N bytes (N being the size of the unibox).
-    fn new<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized;
+    fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized;
     /// Get reference to stored data using a type.
     /// 
     /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic.
@@ -185,7 +191,7 @@ pub struct UniBox64 {
 }
 
 impl StaticUniBox for UniBox64 {
-    fn new<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
+    fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
         Ok(
             Self {
                 unibox: UniBoxN::new(instance, id)?
@@ -212,7 +218,7 @@ pub struct UniBox128 {
 }
 
 impl StaticUniBox for UniBox128 {
-    fn new<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
+    fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
         Ok(
             Self {
                 unibox: UniBoxN::new(instance, id)?
@@ -239,7 +245,7 @@ pub struct UniBox256 {
 }
 
 impl StaticUniBox for UniBox256 {
-    fn new<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
+    fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
         Ok(
             Self {
                 unibox: UniBoxN::new(instance, id)?

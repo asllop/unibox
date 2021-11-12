@@ -37,7 +37,7 @@ fn main() {
     const ADDR_ID : usize = 1;
     const USER_ID : usize = 2;
 
-    let ub1 = UniBox128::new(
+    let ub1 = UniBox128::new_with_id(
         User {
             name: "Andreu".to_owned(),
             surname: "Santarén".to_owned(),
@@ -53,7 +53,7 @@ fn main() {
         USER_ID
     ).expect("Couldn't create UniBox128 for User");
     
-    let ub2 = UniBox128::new(
+    let ub2 = UniBox128::new_with_id(
         Address {
             street: "Carrer Escoles Pies".to_owned(),
             number: 42,
@@ -90,8 +90,7 @@ fn main() {
             city: "Calella".to_owned(),
             zip: 08370,
             country_code: ['C' as u8, 'T' as u8]
-        },
-        ADDR_ID
+        }
     ).expect("Couldn't create UniBox64 for Address");
 
     println!("{:#?}", unsafe { ub3.as_ref::<Address>() });
