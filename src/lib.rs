@@ -24,7 +24,7 @@
 //! 
 //! ## Usage
 //! 
-//! Suppose we have 2 different structs with few or nothing in commond, User and Server. And we want to store instances of these types in the same collection.
+//! Suppose we have 2 different structs with little or nothing in common, like the following User and Server. And we want to store instances of these types in the same collection.
 //! 
 //! We can use static uniboxes like this:
 //! 
