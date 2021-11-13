@@ -36,7 +36,7 @@ impl Uniboxed for UniBox {
         let align = mem::align_of::<T>();
         let len = mem::size_of::<T>();
         let layout = Layout::from_size_align(len, align).unwrap();
-        let buffer = unsafe { alloc::alloc::alloc_zeroed(layout) };
+        let buffer = unsafe { alloc::alloc::alloc(layout) };
         if buffer.is_null() {
             return Err(());
         }
