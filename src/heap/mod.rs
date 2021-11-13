@@ -51,12 +51,6 @@ impl UniBox {
         }
         ptr::read(self.buffer as *const T)
     }
-
-    fn free(&self) {
-        unsafe {
-            alloc::alloc::dealloc(self.buffer, self.layout);
-        }
-    }
 }
 
 impl Uniboxed for UniBox {
@@ -96,6 +90,8 @@ impl Uniboxed for UniBox {
 impl Drop for UniBox {
     fn drop(&mut self) {
         (self.autodrop)(self);
-        self.free();
+        unsafe {
+            alloc::alloc::dealloc(self.buffer, self.layout);
+        }
     }
 }
