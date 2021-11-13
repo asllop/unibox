@@ -19,7 +19,7 @@ UniBox can:
 
 The crate offers two kinds of types:
 
-- Static: uniboxes that store data without using heap memory. Currently are `UniBox32`, `UniBox64`, `UniBox128` and `UniBox256`.
+- Static: uniboxes that store data without using heap memory. They have a fixed size and the type they host can't be bigger than that. Currently there are four types: `UniBox32`, `UniBox64`, `UniBox128` and `UniBox256`, to store types up to 32, 64, 128 and 256 bytes.
 - Dynamic: store data by allocating memory, like a regular Box. There is only one type, `UniBox`.
 
 ## Usage
@@ -28,8 +28,8 @@ Suppose we have 2 different structs with few or nothing in commond, User and Ser
 
 We can use static uniboxes like this:
 
-```Rust
-use unibox::{ StaticUniBox, UniBox64 };
+```
+use unibox::{ Uniboxed, UniBox64 };
 
 #[derive(Debug)]
 struct BornDate {
@@ -94,3 +94,11 @@ for ubox in v.iter() {
     }
 }
 ```
+
+The dynamic version, `UniBox` works exactly in the same way, the only difference is that it allocates memory to store the type and thus, you don't have to worry about it's size.
+
+## Features and `no_std`
+
+This crate is `no_std`, but it uses the [`alloc`](https://doc.rust-lang.org/alloc/) crate to allocate dynamic memory inside `UniBox`. This is controlled via a feature, enabled by default, named `alloc`.
+
+If your environment doesn't provide the alloc crate, just disable the default features. If you do so, you won't be able to use `UniBox`.
