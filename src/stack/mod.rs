@@ -111,6 +111,8 @@ impl Buffer for [u8; 256] {
 }
 
 /// Generic static unibox that can implement any [`Buffer`].
+/// 
+/// This is the base of other static types, and should not be used directly. Use it only to implement your custom static unibox type.
 pub struct UniBoxN<S: Buffer> {
     data: S,
     len: usize,
