@@ -51,7 +51,7 @@
 //!     pub port: u16
 //! }
 //! 
-//! // We use ID to identify the different types ones uniboxed
+//! // We use an ID to identify the different types
 //! const USER_ID : usize = 1111;
 //! const SERVER_ID : usize = 2222;
 //! 
