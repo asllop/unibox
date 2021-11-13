@@ -28,7 +28,7 @@ Suppose we have 2 different structs with little or nothing in common, like the f
 
 We can use static uniboxes like this:
 
-```
+```rust
 use unibox::{ Uniboxed, UniBox64 };
 
 #[derive(Debug)]
