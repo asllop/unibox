@@ -166,6 +166,17 @@ impl<S: Buffer> UniBoxN<S> {
         mem::transmute::<&S, &T>(&self.data)
     }
 
+    /// Get mutable reference to stored data using a type.
+    /// 
+    /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic or any undefined behavior.
+    pub unsafe fn as_mut_ref<T: Sized>(&mut self) -> &mut T {
+        let len = mem::size_of::<T>();
+        if len != self.len {
+            panic!("Size of hosted data and requiered type are different");
+        }
+        mem::transmute::<&mut S, &mut T>(&mut self.data)
+    }
+
     /// Get owned internal type.
     /// 
     /// **WARNING**: After calling this method, the internal buffer may contain invalid data and must not be used anymore.
@@ -213,6 +224,10 @@ impl Uniboxed for UniBox32 {
         self.unibox.as_ref()
     }
 
+    unsafe fn as_mut_ref<T: Sized>(&mut self) -> &mut T {
+        self.unibox.as_mut_ref()
+    }
+
     fn len(&self) -> usize {
         self.unibox.len()
     }
@@ -238,6 +253,10 @@ impl Uniboxed for UniBox64 {
 
     unsafe fn as_ref<T: Sized>(&self) -> &T {
         self.unibox.as_ref()
+    }
+
+    unsafe fn as_mut_ref<T: Sized>(&mut self) -> &mut T {
+        self.unibox.as_mut_ref()
     }
 
     fn len(&self) -> usize {
@@ -267,6 +286,10 @@ impl Uniboxed for UniBox128 {
         self.unibox.as_ref()
     }
 
+    unsafe fn as_mut_ref<T: Sized>(&mut self) -> &mut T {
+        self.unibox.as_mut_ref()
+    }
+
     fn len(&self) -> usize {
         self.unibox.len()
     }
@@ -292,6 +315,10 @@ impl Uniboxed for UniBox256 {
 
     unsafe fn as_ref<T: Sized>(&self) -> &T {
         self.unibox.as_ref()
+    }
+
+    unsafe fn as_mut_ref<T: Sized>(&mut self) -> &mut T {
+        self.unibox.as_mut_ref()
     }
 
     fn len(&self) -> usize {

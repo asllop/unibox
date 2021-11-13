@@ -159,7 +159,7 @@ Address {
         }
     ).expect("Couldn't create dynamic UniBox for Address");
 
-    let ub5 = UniBox::new(
+    let mut ub5 = UniBox::new(
 User {
             name: "Andreu".to_owned(),
             surname: "Llop".to_owned(),
@@ -175,6 +175,12 @@ User {
     ).expect("Couldn't create dynamic UniBox for User");
 
     println!("{:#?}", unsafe { ub4.as_ref::<Address>() });
+    println!("{:#?}", unsafe { ub5.as_ref::<User>() });
+
+    unsafe { ub5.as_mut_ref::<User>() }.address.street = "Changed street".to_owned();
+
+    println!("---- After mutating address street ----");
+
     println!("{:#?}", unsafe { ub5.as_ref::<User>() });
 
     println!("---- Finish and drop all ----");

@@ -118,6 +118,10 @@ pub trait Uniboxed {
     /// 
     /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic or any undefined behavior.
     unsafe fn as_ref<T: Sized>(&self) -> &T;
+    /// Get mutable reference to stored data using a type.
+    /// 
+    /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic or any undefined behavior.
+    unsafe fn as_mut_ref<T: Sized>(&mut self) -> &mut T;
     /// Stored data length.
     fn len(&self) -> usize;
     /// Type identifier.

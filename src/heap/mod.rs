@@ -100,6 +100,14 @@ impl Uniboxed for UniBox {
         mem::transmute::<*mut u8, &T>(self.buffer)
     }
 
+    unsafe fn as_mut_ref<T: Sized>(&mut self) -> &mut T {
+        let len = mem::size_of::<T>();
+        if len != self.len() {
+            panic!("Size of hosted data and requiered type are different");
+        }
+        mem::transmute::<*mut u8, &mut T>(self.buffer)
+    }
+
     fn len(&self) -> usize {
         self.len
     }
