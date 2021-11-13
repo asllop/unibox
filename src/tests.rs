@@ -87,16 +87,22 @@ fn static_32() {
 
 #[test]
 fn static_64() {
+    test_type::<Test32, UniBox64>();
     test_type::<Test64, UniBox64>();
 }
 
 #[test]
 fn static_128() {
+    test_type::<Test32, UniBox128>();
+    test_type::<Test64, UniBox128>();
     test_type::<Test128, UniBox128>();
 }
 
 #[test]
 fn static_256() {
+    test_type::<Test32, UniBox256>();
+    test_type::<Test64, UniBox256>();
+    test_type::<Test128, UniBox256>();
     test_type::<Test256, UniBox256>();
 }
 
