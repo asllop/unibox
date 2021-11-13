@@ -33,6 +33,7 @@ impl Drop for Address {
     }
 }
 
+// To check memory leaks
 fn _main() {
     let mut line = String::new();
     println!("Press enter to start...");
@@ -54,7 +55,7 @@ fn _main() {
             }
         ).expect("Couldn't create UniBox128 for User");
         
-        let y = UniBox128::new(
+        let y = UniBox64::new(
             Address {
                 street: "Sense Nom".to_owned(),
                 number: 666,
@@ -62,7 +63,7 @@ fn _main() {
                 zip: 55555,
                 country_code: ['C' as u8, 'T' as u8]
             }
-        ).expect("Couldn't create UniBox128 for Address");
+        ).expect("Couldn't create UniBox64 for Address");
 
         let z = UniBox::new(
     User {
