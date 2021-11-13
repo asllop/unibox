@@ -63,7 +63,7 @@ fn _main() {
             }
         ).expect("Couldn't create UniBox64 for Address");
 
-        let z = UniBox::new(
+        let mut z = UniBox::new(
     User {
                 name: "Andreu".to_owned(),
                 surname: "Llop".to_owned(),
@@ -77,6 +77,8 @@ fn _main() {
                 }
             }
         ).expect("Couldn't create dynamic UniBox for User");
+
+        unsafe { z.as_mut_ref::<User>() }.address.street = "Changed street".to_owned();
 
         core::mem::drop(x);
         core::mem::drop(y);
