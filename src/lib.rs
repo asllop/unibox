@@ -137,4 +137,5 @@ pub trait Uniboxed {
     fn id(&self) -> usize;
 }
 
-//TODO: write tests
+#[cfg(test)]
+mod tests;
