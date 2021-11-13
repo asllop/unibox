@@ -52,33 +52,20 @@ impl UniBox {
         ptr::read(self.buffer as *const T)
     }
 
-    #[cfg(feature = "alloc")]
     fn free(&self) {
         unsafe {
             alloc::alloc::dealloc(self.buffer, self.layout);
         }
     }
-
-    #[cfg(not(feature = "alloc"))]
-    fn free(&self) {}
 }
 
-//TODO: use cfg to select features (std/no_std, alloc/no_alloc)
-
 impl Uniboxed for UniBox {
-    #[cfg(feature = "alloc")]
     fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
         Ok(
             Self::new_with_alloc(instance, id, |layout| {
                 unsafe { alloc::alloc::alloc_zeroed(layout) }
             })
         )
-    }
-
-    // Without alloc we just don't allow UniBox creation
-    #[cfg(not(feature = "alloc"))]
-    fn new_with_id<T: Sized>(_: T, _: usize) -> Result<Self, ()> where Self: Sized {
-        Err(())
     }
 
     unsafe fn as_ref<T: Sized>(&self) -> &T {

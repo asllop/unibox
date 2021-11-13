@@ -101,7 +101,7 @@
 //! 
 //! This crate is `no_std`, but it uses the [`alloc`](https://doc.rust-lang.org/alloc/) crate to allocate dynamic memory inside [`UniBox`]. This is controlled via a feature, enabled by default, named `alloc`.
 //! 
-//! If your environment doesn't provide the alloc crate, just disable default features. If you do so, you won't be able to use [`UniBox`].
+//! If your environment doesn't provide the alloc crate, just disable the default features. If you do so, you won't be able to use [`UniBox`].
 //! 
 #![no_std]
 
