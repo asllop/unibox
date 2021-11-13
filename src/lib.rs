@@ -133,7 +133,7 @@ pub trait Uniboxed {
     unsafe fn as_mut_ref<T: Sized>(&mut self) -> &mut T;
     /// Stored data length.
     fn len(&self) -> usize;
-    /// Type identifier.
+    /// Type identifier assigned with [`Uniboxed::new_with_id`], or 0 if unibox was created with [`Uniboxed::new`].
     fn id(&self) -> usize;
 }
 
