@@ -19,31 +19,6 @@ pub struct UniBox {
 }
 
 impl UniBox {
-    fn new_with_alloc<T: Sized>(instance: T, id: usize, alloc_func: fn(Layout) -> *mut u8) -> Self where Self: Sized {
-        let autodrop = |_self: &Self| {
-            mem::drop(unsafe { _self.as_owned::<T>() });
-        };
-        let align = mem::align_of::<T>();
-        let len = mem::size_of::<T>();
-        let layout = Layout::from_size_align(len, align).unwrap();
-        let buffer = alloc_func(layout);
-        if buffer.is_null() {
-            panic!("Null pointer exception");
-        }
-        let src = &instance as *const T;
-        unsafe {
-            core::ptr::copy(src, buffer as *mut T, 1)
-        };
-        mem::forget(instance);
-        Self {
-            buffer,
-            layout,
-            id,
-            len,
-            autodrop
-        }
-    }
-    
     unsafe fn as_owned<T: Sized>(&self) -> T {
         let len = mem::size_of::<T>();
         if len != self.len {
@@ -55,10 +30,29 @@ impl UniBox {
 
 impl Uniboxed for UniBox {
     fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
+        let autodrop = |_self: &Self| {
+            mem::drop(unsafe { _self.as_owned::<T>() });
+        };
+        let align = mem::align_of::<T>();
+        let len = mem::size_of::<T>();
+        let layout = Layout::from_size_align(len, align).unwrap();
+        let buffer = unsafe { alloc::alloc::alloc_zeroed(layout) };
+        if buffer.is_null() {
+            return Err(());
+        }
+        let src = &instance as *const T;
+        unsafe {
+            core::ptr::copy(src, buffer as *mut T, 1)
+        };
+        mem::forget(instance);
         Ok(
-            Self::new_with_alloc(instance, id, |layout| {
-                unsafe { alloc::alloc::alloc_zeroed(layout) }
-            })
+            Self {
+                buffer,
+                layout,
+                id,
+                len,
+                autodrop
+            }
         )
     }
 
