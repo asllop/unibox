@@ -7,6 +7,7 @@ use core::{
     ptr
 };
 use super::Uniboxed;
+extern crate alloc;
 
 /// Store a type on heap.
 pub struct UniBox {
@@ -51,46 +52,34 @@ impl UniBox {
         ptr::read(self.buffer as *const T)
     }
 
-    //TODO: implement for no_std and no_alloc
-    // With std
+    #[cfg(feature = "alloc")]
     fn free(&self) {
         unsafe {
-            std::alloc::dealloc(self.buffer, self.layout);
+            alloc::alloc::dealloc(self.buffer, self.layout);
         }
     }
+
+    #[cfg(not(feature = "alloc"))]
+    fn free(&self) {}
 }
 
 //TODO: use cfg to select features (std/no_std, alloc/no_alloc)
 
 impl Uniboxed for UniBox {
-    // With std
+    #[cfg(feature = "alloc")]
     fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
         Ok(
             Self::new_with_alloc(instance, id, |layout| {
-                unsafe { std::alloc::alloc_zeroed(layout) }
+                unsafe { alloc::alloc::alloc_zeroed(layout) }
             })
         )
     }
 
-    /*
-    // Without std, with alloc
-    fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
-        extern crate alloc;
-        use alloc::alloc::alloc_zeroed;
-        Ok(
-            Self::new_with_alloc(instance, id, |layout| {
-                unsafe { alloc_zeroed(layout) }
-            })
-        )
-    }
-    */
-
-    /*
-    // Without std and alloc
+    // Without alloc we just don't allow UniBox creation
+    #[cfg(not(feature = "alloc"))]
     fn new_with_id<T: Sized>(_: T, _: usize) -> Result<Self, ()> where Self: Sized {
         Err(())
     }
-    */
 
     unsafe fn as_ref<T: Sized>(&self) -> &T {
         let len = mem::size_of::<T>();
@@ -119,7 +108,6 @@ impl Uniboxed for UniBox {
 
 impl Drop for UniBox {
     fn drop(&mut self) {
-        println!("UniBox(heap) dropped");
         (self.autodrop)(self);
         self.free();
     }

@@ -177,10 +177,9 @@ User {
     println!("{:#?}", unsafe { ub4.as_ref::<Address>() });
     println!("{:#?}", unsafe { ub5.as_ref::<User>() });
 
-    unsafe { ub5.as_mut_ref::<User>() }.address.street = "Changed street".to_owned();
-
     println!("---- After mutating address street ----");
 
+    unsafe { ub5.as_mut_ref::<User>() }.address.street = "Changed street".to_owned();
     println!("{:#?}", unsafe { ub5.as_ref::<User>() });
 
     println!("---- Finish and drop all ----");

@@ -201,7 +201,6 @@ impl<S: Buffer> UniBoxN<S> {
 
 impl<S: Buffer> Drop for UniBoxN<S> {
     fn drop(&mut self) {
-        println!("UniBoxN({}) dropped", S::len());
         (self.autodrop)(self);
     }
 }

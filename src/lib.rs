@@ -97,8 +97,17 @@
 //! 
 //! The dynamic version, [`UniBox`] works exactly in the same way, the only difference is that it allocates memory to store the type and thus, you don't have to worry about it's size.
 //! 
+//! ## Features and `no_std`
+//! 
+//! This crate is `no_std`, but it uses the [`alloc`](https://doc.rust-lang.org/alloc/) crate to allocate dynamic memory inside [`UniBox`]. This is controlled via a feature, enabled by default, named `alloc`.
+//! 
+//! If your environment doesn't provide the alloc crate, just disable default features. If you do so, you won't be able to use [`UniBox`].
+//! 
+#![no_std]
 
+#[cfg(feature = "alloc")]
 mod heap;
+#[cfg(feature = "alloc")]
 pub use heap::*;
 
 mod stack;
