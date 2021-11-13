@@ -113,14 +113,14 @@ impl Buffer for [u8; 256] {
 /// Generic static unibox that can implement any [`Buffer`].
 /// 
 /// This is the base of other static types, and should not be used directly. Use it only to implement your custom static unibox type.
-pub struct UniBoxN<S: Buffer> {
-    data: S,
+pub struct UniBoxN<B: Buffer> {
+    data: B,
     len: usize,
     autodrop: fn(&Self),
     id: usize
 }
 
-impl<S: Buffer> UniBoxN<S> {
+impl<B: Buffer> UniBoxN<B> {
     /// Create a new UniBox instance.
     /// 
     /// Accepts an *instance* and an *id*: a custom defined identifier used to know what type lies inside.
@@ -137,11 +137,11 @@ impl<S: Buffer> UniBoxN<S> {
             mem::drop(unsafe { _self.as_owned::<T>() });
         };
         let len = bytes.len();
-        if len > S::len() {
+        if len > B::len() {
             Err(())
         }
         else {
-            let mut data = S::init();
+            let mut data = B::init();
             data.copy_from_byte(bytes, len);
             mem::forget(instance);
             Ok(
@@ -163,7 +163,7 @@ impl<S: Buffer> UniBoxN<S> {
         if len != self.len {
             panic!("Size of hosted data and requiered type are different");
         }
-        mem::transmute::<&S, &T>(&self.data)
+        mem::transmute::<&B, &T>(&self.data)
     }
 
     /// Get mutable reference to stored data using a type.
@@ -174,7 +174,7 @@ impl<S: Buffer> UniBoxN<S> {
         if len != self.len {
             panic!("Size of hosted data and requiered type are different");
         }
-        mem::transmute::<&mut S, &mut T>(&mut self.data)
+        mem::transmute::<&mut B, &mut T>(&mut self.data)
     }
 
     /// Get owned internal type.
