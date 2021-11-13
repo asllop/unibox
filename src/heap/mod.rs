@@ -33,9 +33,8 @@ impl Uniboxed for UniBox {
         let autodrop = |_self: &Self| {
             mem::drop(unsafe { _self.as_owned::<T>() });
         };
-        let align = mem::align_of::<T>();
         let len = mem::size_of::<T>();
-        let layout = Layout::from_size_align(len, align).unwrap();
+        let layout = Layout::new::<T>();
         let buffer = unsafe { alloc::alloc::alloc(layout) };
         if buffer.is_null() {
             return Err(());
