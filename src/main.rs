@@ -1,6 +1,4 @@
-use unibox::{
-    Uniboxed, UniBox64, UniBox128, UniBox
-};
+use unibox::{UniBox, UniBox128, UniBox64, UniBox32, Uniboxed};
 
 #[derive(Debug)]
 #[allow(dead_code)]
@@ -182,6 +180,33 @@ User {
 
     unsafe { ub5.as_mut_ref::<User>() }.address.street = "Changed street".to_owned();
     println!("{:#?}", unsafe { ub5.as_ref::<User>() });
+
+    println!("---- Create uniboxed enum ----");
+
+    #[derive(Debug)]
+    #[allow(dead_code)]
+    enum Color {
+        Red,
+        Gree,
+        Blue,
+        Custom(u8, u8, u8)
+    }
+
+    let ub6 = UniBox32::new(Color::Blue).expect("Failed uniboxing Color");
+    println!("{:#?}", unsafe { ub6.as_ref::<Color>() });
+    let ub6 = UniBox32::new(Color::Custom(0,100,200)).expect("Failed uniboxing Color");
+    println!("{:#?}", unsafe { ub6.as_ref::<Color>() });
+
+    println!("---- Create uniboxed primitive types ----");
+
+    let ub7 = UniBox32::new([10, 100, 1000, -10000]).expect("Failed uniboxing [i32; 4]");
+    println!("{:#?}", unsafe { ub7.as_ref::<[i32; 4]>() });
+
+    let ub7 = UniBox32::new("hello").expect("Failed uniboxing &str");
+    println!("{:#?}", unsafe { ub7.as_ref::<&str>() });
+
+    let ub7 = UniBox32::new(99.99).expect("Failed uniboxing f64");
+    println!("{:#?}", unsafe { ub7.as_ref::<f64>() });
 
     println!("---- Finish and drop all ----");
 }
