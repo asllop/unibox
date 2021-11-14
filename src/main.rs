@@ -90,6 +90,11 @@ fn main() {
     const ADDR_ID : usize = 1;
     const USER_ID : usize = 2;
 
+    println!("Size of User {}", std::mem::size_of::<User>());
+    println!("Size of Address {}", std::mem::size_of::<Address>());
+    println!("Align of User {}", std::mem::align_of::<User>());
+    println!("Align of Address {}", std::mem::align_of::<Address>());
+
     let ub1 = UniBox128::new_with_id(
         User {
             name: "Andreu".to_owned(),

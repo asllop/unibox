@@ -12,8 +12,6 @@ use super::Uniboxed;
 pub trait Buffer {
     /// Init the type.
     fn init() -> Self;
-    /// Type length.
-    fn len() -> usize;
     /// Raw pointer to type.
     fn ptr<T>(&self) -> *const T;
     /// Copy from byte array to type *len* bytes.
@@ -25,10 +23,6 @@ pub trait Buffer {
 impl Buffer for [u8; 32] {
     fn init() -> Self {
         [0; 32]
-    }
-
-    fn len() -> usize {
-        32
     }
 
     fn ptr<T>(&self) -> *const T {
@@ -49,10 +43,6 @@ impl Buffer for [u8; 64] {
         [0; 64]
     }
 
-    fn len() -> usize {
-        64
-    }
-
     fn ptr<T>(&self) -> *const T {
         self.as_ptr() as *const T
     }
@@ -71,10 +61,6 @@ impl Buffer for [u8; 128] {
         [0; 128]
     }
 
-    fn len() -> usize {
-        128
-    }
-
     fn ptr<T>(&self) -> *const T {
         self.as_ptr() as *const T
     }
@@ -91,10 +77,6 @@ impl Buffer for [u8; 128] {
 impl Buffer for [u8; 256] {
     fn init() -> Self {
         [0; 256]
-    }
-
-    fn len() -> usize {
-        256
     }
 
     fn ptr<T>(&self) -> *const T {
@@ -116,6 +98,7 @@ impl Buffer for [u8; 256] {
 pub struct UniBoxN<B: Buffer> {
     data: B,
     len: usize,
+    alig: usize,
     autodrop: fn(&Self),
     id: usize
 }
@@ -137,7 +120,7 @@ impl<B: Buffer> UniBoxN<B> {
             mem::drop(unsafe { _self.as_owned::<T>() });
         };
         let len = bytes.len();
-        if len > B::len() {
+        if len > mem::size_of::<B>() {
             Err(())
         }
         else {
@@ -148,6 +131,7 @@ impl<B: Buffer> UniBoxN<B> {
                 Self {
                     data,
                     len,
+                    alig: mem::align_of::<T>(),
                     autodrop,
                     id
                 }
@@ -160,8 +144,10 @@ impl<B: Buffer> UniBoxN<B> {
     /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic or any undefined behavior.
     pub unsafe fn as_ref<T: Sized>(&self) -> &T {
         let len = mem::size_of::<T>();
-        if len != self.len {
-            panic!("Size of hosted data and requiered type are different");
+        let alig = mem::align_of::<T>();
+        // Integrity checks
+        if len != self.len || alig != self.alig {
+            panic!("Size or align of hosted and requiered types are different");
         }
         mem::transmute::<&B, &T>(&self.data)
     }
@@ -171,8 +157,10 @@ impl<B: Buffer> UniBoxN<B> {
     /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic or any undefined behavior.
     pub unsafe fn as_mut_ref<T: Sized>(&mut self) -> &mut T {
         let len = mem::size_of::<T>();
-        if len != self.len {
-            panic!("Size of hosted data and requiered type are different");
+        let alig = mem::align_of::<T>();
+        // Integrity checks
+        if len != self.len || alig != self.alig {
+            panic!("Size or align of hosted and requiered types are different");
         }
         mem::transmute::<&mut B, &mut T>(&mut self.data)
     }
@@ -188,10 +176,6 @@ impl<B: Buffer> UniBoxN<B> {
     }
 
     unsafe fn as_owned<T: Sized>(&self) -> T {
-        let len = mem::size_of::<T>();
-        if len != self.len {
-            panic!("Size of hosted data and requiered type are different");
-        }
         ptr::read(self.data.ptr() as *const T)
     }
 }

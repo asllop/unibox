@@ -15,6 +15,7 @@ pub struct UniBox {
     layout: Layout,
     id: usize,
     len: usize,
+    alig: usize,
     autodrop: fn(&Self)
 }
 
@@ -33,7 +34,6 @@ impl Uniboxed for UniBox {
         let autodrop = |_self: &Self| {
             mem::drop(unsafe { _self.as_owned::<T>() });
         };
-        let len = mem::size_of::<T>();
         let layout = Layout::new::<T>();
         let buffer = unsafe { alloc::alloc::alloc(layout) };
         if buffer.is_null() {
@@ -49,7 +49,8 @@ impl Uniboxed for UniBox {
                 buffer,
                 layout,
                 id,
-                len,
+                len: mem::size_of::<T>(),
+                alig: mem::align_of::<T>(),
                 autodrop
             }
         )
@@ -57,16 +58,20 @@ impl Uniboxed for UniBox {
 
     unsafe fn as_ref<T: Sized>(&self) -> &T {
         let len = mem::size_of::<T>();
-        if len != self.len() {
-            panic!("Size of hosted data and requiered type are different");
+        let alig = mem::align_of::<T>();
+        // Integrity checks
+        if len != self.len || alig != self.alig {
+            panic!("Size or align of hosted and requiered types are different");
         }
         mem::transmute::<*mut u8, &T>(self.buffer)
     }
 
     unsafe fn as_mut_ref<T: Sized>(&mut self) -> &mut T {
         let len = mem::size_of::<T>();
-        if len != self.len() {
-            panic!("Size of hosted data and requiered type are different");
+        let alig = mem::align_of::<T>();
+        // Integrity checks
+        if len != self.len || alig != self.alig {
+            panic!("Size or align of hosted and requiered types are different");
         }
         mem::transmute::<*mut u8, &mut T>(self.buffer)
     }
