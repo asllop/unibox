@@ -206,7 +206,7 @@ User {
 
     println!("---- Create uniboxed primitive types ----");
 
-    let ub7 = UniBox32::new([10, 100, 1000, -10000]).expect("Failed uniboxing [i32; 4]");
+    let ub7 = UniBox32::new([10, -100, 1000, -10000]).expect("Failed uniboxing [i32; 4]");
     println!("{:#?}", unsafe { ub7.as_ref::<[i32; 4]>() });
 
     let ub7 = UniBox32::new("hello").expect("Failed uniboxing &str");
@@ -214,6 +214,12 @@ User {
 
     let ub7 = UniBox32::new(99.99).expect("Failed uniboxing f64");
     println!("{:#?}", unsafe { ub7.as_ref::<f64>() });
+
+    let ub8 = UniBox32::new(()).expect("Failed uniboxing ()");
+    println!("{:#?}", unsafe { ub8.as_ref::<()>() });
+
+    let ub9 = UniBox32::new(true).expect("Failed uniboxing bool");
+    println!("{:#?}", unsafe { ub9.as_ref::<bool>() });
 
     println!("---- Finish and drop all ----");
 }
