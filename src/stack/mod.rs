@@ -177,17 +177,6 @@ impl<B: Buffer> UniBoxN<B> {
         mem::transmute::<&mut B, &mut T>(&mut self.data)
     }
 
-    /// Get owned internal type.
-    /// 
-    /// **WARNING**: After calling this method, the internal buffer may contain invalid data and must not be used anymore.
-    pub unsafe fn as_owned<T: Sized>(&self) -> T {
-        let len = mem::size_of::<T>();
-        if len != self.len {
-            panic!("Size of hosted data and requiered type are different");
-        }
-        ptr::read(self.data.ptr() as *const T)
-    }
-
     /// Stored data length.
     pub fn len(&self) -> usize {
         self.len
@@ -196,6 +185,14 @@ impl<B: Buffer> UniBoxN<B> {
     /// Type identifier.
     pub fn id(&self) -> usize {
         self.id
+    }
+
+    unsafe fn as_owned<T: Sized>(&self) -> T {
+        let len = mem::size_of::<T>();
+        if len != self.len {
+            panic!("Size of hosted data and requiered type are different");
+        }
+        ptr::read(self.data.ptr() as *const T)
     }
 }
 
