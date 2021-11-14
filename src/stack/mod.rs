@@ -143,12 +143,7 @@ impl<B: Buffer> UniBoxN<B> {
     /// 
     /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic or any undefined behavior.
     pub unsafe fn as_ref<T: Sized>(&self) -> &T {
-        let len = mem::size_of::<T>();
-        let alig = mem::align_of::<T>();
-        // Integrity checks
-        if len != self.len || alig != self.alig {
-            panic!("Size or align of hosted and requiered types are different");
-        }
+        self.integrity_checks::<T>();
         mem::transmute::<&B, &T>(&self.data)
     }
 
@@ -156,12 +151,7 @@ impl<B: Buffer> UniBoxN<B> {
     /// 
     /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic or any undefined behavior.
     pub unsafe fn as_mut_ref<T: Sized>(&mut self) -> &mut T {
-        let len = mem::size_of::<T>();
-        let alig = mem::align_of::<T>();
-        // Integrity checks
-        if len != self.len || alig != self.alig {
-            panic!("Size or align of hosted and requiered types are different");
-        }
+        self.integrity_checks::<T>();
         mem::transmute::<&mut B, &mut T>(&mut self.data)
     }
 
@@ -177,6 +167,15 @@ impl<B: Buffer> UniBoxN<B> {
 
     unsafe fn as_owned<T: Sized>(&self) -> T {
         ptr::read(self.data.ptr() as *const T)
+    }
+
+    fn integrity_checks<T>(&self) {
+        let len = mem::size_of::<T>();
+        let alig = mem::align_of::<T>();
+        // Integrity checks
+        if len != self.len || alig != self.alig {
+            panic!("Size or align of hosted and requiered types are different");
+        }
     }
 }
 

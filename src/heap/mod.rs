@@ -21,11 +21,16 @@ pub struct UniBox {
 
 impl UniBox {
     unsafe fn as_owned<T: Sized>(&self) -> T {
-        let len = mem::size_of::<T>();
-        if len != self.len {
-            panic!("Size of hosted data and requiered type are different");
-        }
         ptr::read(self.buffer as *const T)
+    }
+
+    fn integrity_checks<T>(&self) {
+        let len = mem::size_of::<T>();
+        let alig = mem::align_of::<T>();
+        // Integrity checks
+        if len != self.len || alig != self.alig {
+            panic!("Size or align of hosted and requiered types are different");
+        }
     }
 }
 
@@ -57,22 +62,12 @@ impl Uniboxed for UniBox {
     }
 
     unsafe fn as_ref<T: Sized>(&self) -> &T {
-        let len = mem::size_of::<T>();
-        let alig = mem::align_of::<T>();
-        // Integrity checks
-        if len != self.len || alig != self.alig {
-            panic!("Size or align of hosted and requiered types are different");
-        }
+        self.integrity_checks::<T>();
         mem::transmute::<*mut u8, &T>(self.buffer)
     }
 
     unsafe fn as_mut_ref<T: Sized>(&mut self) -> &mut T {
-        let len = mem::size_of::<T>();
-        let alig = mem::align_of::<T>();
-        // Integrity checks
-        if len != self.len || alig != self.alig {
-            panic!("Size or align of hosted and requiered types are different");
-        }
+        self.integrity_checks::<T>();
         mem::transmute::<*mut u8, &mut T>(self.buffer)
     }
 
