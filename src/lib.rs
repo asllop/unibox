@@ -1,6 +1,6 @@
 //! # UniBox
 //! 
-//! *Universal Box that can store any type.*
+//! *Universal Box.*
 //! 
 //! Usually, when we want to store different types in a collection we use either one of the following techniques:
 //! 
@@ -13,9 +13,10 @@
 //! 
 //! UniBox can:
 //! 
-//! - Store a generic struct in static or dynamic memory, you decide.
+//! - Store a generic type without using generics in the struct signature.
+//! - Use either static or dynamic memory, you decide.
 //! - Return a reference to any type.
-//! - Be used to store mixed data in collections.
+//! - Be used to store mixed data in collections or arrays.
 //! 
 //! The crate offers two kinds of types:
 //! 
@@ -75,7 +76,7 @@
 //!         port: 8080
 //!     },
 //!     SERVER_ID
-//! ).expect("Couldn't create UniBox64 for User");
+//! ).expect("Couldn't create UniBox64 for Server");
 //! 
 //! // Create a vector with the uniboxes
 //! let v = vec!(ubox_usr, ubox_server);
@@ -101,7 +102,7 @@
 //! 
 //! This crate is `no_std`, but it uses the [`alloc`](https://doc.rust-lang.org/alloc/) crate to allocate dynamic memory inside [`UniBox`]. This is controlled via a feature, enabled by default, named `alloc`.
 //! 
-//! If your environment doesn't provide the alloc crate, just disable the default features. If you do so, you won't be able to use [`UniBox`].
+//! If your environment doesn't provide the alloc crate, just disable the default features. If you do so, you won't be able to use [`UniBox`] type.
 //! 
 #![no_std]
 
@@ -113,29 +114,8 @@ pub use heap::*;
 mod stack;
 pub use stack::*;
 
-/// Generic trait for all uniboxes.
-pub trait Uniboxed {
-    /// Create a new UniBox instance.
-    fn new<T: Sized>(instance: T) -> Result<Self, ()> where Self: Sized {
-        Self::new_with_id(instance, 0)
-    }
-    /// Create a new UniBox instance.
-    /// 
-    /// Accepts an *instance* and an *id*: a custom defined identifier used to know what type lies inside.
-    fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized;
-    /// Get reference to stored data using a type.
-    /// 
-    /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic or any undefined behavior.
-    unsafe fn as_ref<T: Sized>(&self) -> &T;
-    /// Get mutable reference to stored data using a type.
-    /// 
-    /// **WARNING**: If you try to cast a type other than the one actually hosted, you may get a panic or any undefined behavior.
-    unsafe fn as_mut_ref<T: Sized>(&mut self) -> &mut T;
-    /// Stored data length.
-    fn len(&self) -> usize;
-    /// Type identifier assigned with [`Uniboxed::new_with_id`], or 0 if unibox was created with [`Uniboxed::new`].
-    fn id(&self) -> usize;
-}
+mod uniboxed;
+pub use uniboxed::*;
 
 #[cfg(test)]
 mod tests;

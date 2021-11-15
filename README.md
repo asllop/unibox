@@ -1,6 +1,6 @@
 # UniBox
 
-*Universal Box that can store any type.*
+*Universal Box.*
 
 Usually, when we want to store different types in a collection we use either one of the following techniques:
 
@@ -13,9 +13,10 @@ If you encountered any of these limitations, UniBox is probably a viable solutio
 
 UniBox can:
 
-- Store a generic struct in static or dynamic memory, you decide.
+- Store a generic type without using generics in the struct signature.
+- Use either static or dynamic memory, you decide.
 - Return a reference to any type.
-- Be used to store mixed data in collections.
+- Be used to store mixed data in collections or arrays.
 
 The crate offers two kinds of types:
 
@@ -75,7 +76,7 @@ let ubox_server = UniBox64::new_with_id(
         port: 8080
     },
     SERVER_ID
-).expect("Couldn't create UniBox64 for User");
+).expect("Couldn't create UniBox64 for Server");
 
 // Create a vector with the uniboxes
 let v = vec!(ubox_usr, ubox_server);
@@ -101,4 +102,4 @@ The dynamic version, `UniBox` works exactly in the same way, the only difference
 
 This crate is `no_std`, but it uses the [`alloc`](https://doc.rust-lang.org/alloc/) crate to allocate dynamic memory inside `UniBox`. This is controlled via a feature, enabled by default, named `alloc`.
 
-If your environment doesn't provide the alloc crate, just disable the default features. If you do so, you won't be able to use `UniBox`.
+If your environment doesn't provide the alloc crate, just disable the default features. If you do so, you won't be able to use `UniBox` type.
