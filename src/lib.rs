@@ -18,16 +18,16 @@
 //! - Return a reference to any type.
 //! - Be used to store mixed data in collections or arrays.
 //! 
-//! The crate offers two kinds of types:
+//! UniBox offers two kinds of types:
 //! 
-//! - Static: uniboxes that store data without using heap memory. They have a fixed size and the type they host can't be bigger than that. Currently there are four types: [`UniBox32`], [`UniBox64`], [`UniBox128`] and [`UniBox256`], to store types up to 32, 64, 128 and 256 bytes.
-//! - Dynamic: store data by allocating memory, like a regular Box. There is only one type, [`UniBox`].
+//! - *Static*: uniboxes that store data without using the heap. They have a fixed size, and the type they host can't be bigger than that. Currently there are four types: [`UniBox32`], [`UniBox64`], [`UniBox128`] and [`UniBox256`], to store types up to 32, 64, 128 and 256 bytes. All these types are based on the generic static type, [`UniBoxN`], that can also be used to implement custom static uniboxes.
+//! - *Dynamic*: store data by allocating memory, like a regular Box. There is only one type, [`UniBox`].
 //! 
 //! ## Usage
 //! 
 //! Suppose we have 2 different structs with little or nothing in common, like the following User and Server. And we want to store instances of these types in the same collection.
 //! 
-//! We can use static uniboxes like this:
+//! We can use static uniboxes like so:
 //! 
 //! ```
 //! use unibox::{ Uniboxed, UniBox64 };
@@ -96,7 +96,7 @@
 //! }
 //! ```
 //! 
-//! The dynamic version, [`UniBox`] works exactly in the same way, the only difference is that it allocates memory to store the type and thus, you don't have to worry about it's size.
+//! The dynamic version, [`UniBox`], works exactly in the same way, the only difference is that it allocates memory to store the type and thus, you don't have to worry about the size.
 //! 
 //! ## Features and `no_std`
 //! 
