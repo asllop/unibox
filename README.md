@@ -98,6 +98,21 @@ for ubox in v.iter() {
 
 The dynamic version, `UniBox`, works exactly in the same way, the only difference is that it allocates memory to store the type and thus, you don't have to worry about the size.
 
+## Why not `Any`?
+
+The [`Any`](https://doc.rust-lang.org/std/any/trait.Any.html) trait exposes a similar functionality, it allows a generic type to be casted, but it has some limitations compared to uniboxes:
+
+1. Only types with static references can be used, so something like the following can't be allocated inside a `Box<dyn Any>`:
+
+```
+struct MyStruct<'a> {
+    my_ref: &'a [i32]
+}
+```
+
+2. The size of a `dyn Any` can't be known at compile time, and thus, we can't use it to store generic types inside arrays or other non-heap memory artifacts.
+
+
 ## Features and `no_std`
 
 This crate is `no_std`, but it uses the [`alloc`](https://doc.rust-lang.org/alloc/) crate to allocate dynamic memory inside `UniBox`. This is controlled via a feature, enabled by default, named `alloc`.
