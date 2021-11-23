@@ -52,12 +52,7 @@ struct Server {
     pub port: u16
 }
 
-// We use an ID to identify the different types
-const USER_ID : usize = 1111;
-const SERVER_ID : usize = 2222;
-
-// If we don't care about identifying the internal type, we can use UniBox64::new() instead
-let ubox_usr = UniBox64::new_with_id(
+let ubox_usr = UniBox64::new(
     User {
         name: "John".to_owned(),
         lastname: "Dow".to_owned(),
@@ -66,16 +61,14 @@ let ubox_usr = UniBox64::new_with_id(
             month: 12,
             day: 25
         }
-    },
-    USER_ID
+    }
 ).expect("Couldn't create UniBox64 for User");
 
-let ubox_server = UniBox64::new_with_id(
+let ubox_server = UniBox64::new(
     Server {
         domain: "example.com".to_owned(),
         port: 8080
-    },
-    SERVER_ID
+    }
 ).expect("Couldn't create UniBox64 for Server");
 
 // Create a vector with the uniboxes
@@ -83,11 +76,11 @@ let v = vec!(ubox_usr, ubox_server);
 
 for ubox in v.iter() {
     match ubox.id() {
-        USER_ID => {
+        "my_crate::User" => {
             // It's a User struct
             println!("{:#?}", unsafe { ubox.as_ref::<User>() });
         },
-        SERVER_ID => {
+        "my_crate::Server" => {
             // It's a Server struct
             println!("{:#?}", unsafe { ubox.as_ref::<Server>() });
         },

@@ -76,11 +76,11 @@
 //! 
 //! for ubox in v.iter() {
 //!     match ubox.id() {
-//!         "whatever::User" => {
+//!         "my_crate::User" => {
 //!             // It's a User struct
 //!             println!("{:#?}", unsafe { ubox.as_ref::<User>() });
 //!         },
-//!         "whatever::Server" => {
+//!         "my_crate::Server" => {
 //!             // It's a Server struct
 //!             println!("{:#?}", unsafe { ubox.as_ref::<Server>() });
 //!         },
