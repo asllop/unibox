@@ -52,12 +52,7 @@
 //!     pub port: u16
 //! }
 //! 
-//! // We use an ID to identify the different types
-//! const USER_ID : usize = 1111;
-//! const SERVER_ID : usize = 2222;
-//! 
-//! // If we don't care about identifying the internal type, we can use UniBox64::new() instead
-//! let ubox_usr = UniBox64::new_with_id(
+//! let ubox_usr = UniBox64::new(
 //!     User {
 //!         name: "John".to_owned(),
 //!         lastname: "Dow".to_owned(),
@@ -66,16 +61,14 @@
 //!             month: 12,
 //!             day: 25
 //!         }
-//!     },
-//!     USER_ID
+//!     }
 //! ).expect("Couldn't create UniBox64 for User");
 //! 
-//! let ubox_server = UniBox64::new_with_id(
+//! let ubox_server = UniBox64::new(
 //!     Server {
 //!         domain: "example.com".to_owned(),
 //!         port: 8080
-//!     },
-//!     SERVER_ID
+//!     }
 //! ).expect("Couldn't create UniBox64 for Server");
 //! 
 //! // Create a vector with the uniboxes
@@ -83,11 +76,11 @@
 //! 
 //! for ubox in v.iter() {
 //!     match ubox.id() {
-//!         USER_ID => {
+//!         "whatever::User" => {
 //!             // It's a User struct
 //!             println!("{:#?}", unsafe { ubox.as_ref::<User>() });
 //!         },
-//!         SERVER_ID => {
+//!         "whatever::Server" => {
 //!             // It's a Server struct
 //!             println!("{:#?}", unsafe { ubox.as_ref::<Server>() });
 //!         },
@@ -97,6 +90,29 @@
 //! ```
 //! 
 //! The dynamic version, [`UniBox`], works exactly in the same way, the only difference is that it allocates memory to store the type and thus, you don't have to worry about the size.
+//! 
+//! ## Uniboxing types with references
+//! 
+//! Is possible to unibox a type that contains a reference with non-static lifetime, like so:
+//! 
+//! ```
+//! # use unibox::{ Uniboxed, UniBox32 };
+//! struct MyStruct<'a> {
+//!     my_ref: &'a [i32]
+//! }
+//! 
+//! let arr = [1, 2, 3, 4, 5];
+//! 
+//! let ubox = UniBox32::new(
+//!     MyStruct {
+//!         my_ref: &arr
+//!     }
+//! ).expect("Failed uniboxing MyStruct");
+//! 
+//! println!("{:#?}", unsafe { ubox.as_ref::<MyStruct>() }.my_ref);
+//! ```
+//! 
+//! But once the type is embedded inside a UniBox, the rust compiler looses track of it, and it won't be able to ensure that lifetime constraints are observed. For this reason, is the programmer who must make sure that no references are used after being droped the original value. That's the main reason why [`Uniboxed::as_ref`] and [`Uniboxed::as_mut_ref`] are unsafe.
 //! 
 //! ## Why not `Any`?
 //! 

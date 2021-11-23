@@ -13,9 +13,8 @@ extern crate alloc;
 pub struct UniBox {
     buffer: *mut u8,
     layout: Layout,
-    id: usize,
+    id: &'static str,
     len: usize,
-    alig: usize,
     autodrop: fn(&Self)
 }
 
@@ -25,17 +24,14 @@ impl UniBox {
     }
 
     fn integrity_checks<T>(&self) {
-        let len = mem::size_of::<T>();
-        let alig = mem::align_of::<T>();
-        // Integrity checks
-        if len != self.len || alig != self.alig {
-            panic!("Size or align of hosted and requiered types are different");
+        if !self.check_type::<T>() {
+            panic!("Hosted and requiered types are different");
         }
     }
 }
 
 impl Uniboxed for UniBox {
-    fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
+    fn new<T: Sized>(instance: T) -> Result<Self, ()> where Self: Sized {
         let autodrop = |_self: &Self| {
             mem::drop(unsafe { _self.as_owned::<T>() });
         };
@@ -53,9 +49,8 @@ impl Uniboxed for UniBox {
             Self {
                 buffer,
                 layout,
-                id,
+                id: core::any::type_name::<T>(),
                 len: mem::size_of::<T>(),
-                alig: mem::align_of::<T>(),
                 autodrop
             }
         )
@@ -75,7 +70,7 @@ impl Uniboxed for UniBox {
         self.len
     }
 
-    fn id(&self) -> usize {
+    fn id(&self) -> &'static str {
         self.id
     }
 }

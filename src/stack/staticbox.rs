@@ -7,10 +7,10 @@ pub struct UniBox32 {
 }
 
 impl Uniboxed for UniBox32 {
-    fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
+    fn new<T: Sized>(instance: T) -> Result<Self, ()> where Self: Sized {
         Ok(
             Self {
-                unibox: UniBoxN::new(instance, id)?
+                unibox: UniBoxN::new(instance)?
             }
         )
     }
@@ -27,7 +27,7 @@ impl Uniboxed for UniBox32 {
         self.unibox.len()
     }
 
-    fn id(&self) -> usize {
+    fn id(&self) -> &'static str {
         self.unibox.id()
     }
 }
@@ -38,10 +38,10 @@ pub struct UniBox64 {
 }
 
 impl Uniboxed for UniBox64 {
-    fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
+    fn new<T: Sized>(instance: T) -> Result<Self, ()> where Self: Sized {
         Ok(
             Self {
-                unibox: UniBoxN::new(instance, id)?
+                unibox: UniBoxN::new(instance)?
             }
         )
     }
@@ -58,7 +58,7 @@ impl Uniboxed for UniBox64 {
         self.unibox.len()
     }
 
-    fn id(&self) -> usize {
+    fn id(&self) -> &'static str {
         self.unibox.id()
     }
 }
@@ -69,10 +69,10 @@ pub struct UniBox128 {
 }
 
 impl Uniboxed for UniBox128 {
-    fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
+    fn new<T: Sized>(instance: T) -> Result<Self, ()> where Self: Sized {
         Ok(
             Self {
-                unibox: UniBoxN::new(instance, id)?
+                unibox: UniBoxN::new(instance)?
             }
         )
     }
@@ -89,7 +89,7 @@ impl Uniboxed for UniBox128 {
         self.unibox.len()
     }
 
-    fn id(&self) -> usize {
+    fn id(&self) -> &'static str {
         self.unibox.id()
     }
 }
@@ -100,10 +100,10 @@ pub struct UniBox256 {
 }
 
 impl Uniboxed for UniBox256 {
-    fn new_with_id<T: Sized>(instance: T, id: usize) -> Result<Self, ()> where Self: Sized {
+    fn new<T: Sized>(instance: T) -> Result<Self, ()> where Self: Sized {
         Ok(
             Self {
-                unibox: UniBoxN::new(instance, id)?
+                unibox: UniBoxN::new(instance)?
             }
         )
     }
@@ -120,7 +120,7 @@ impl Uniboxed for UniBox256 {
         self.unibox.len()
     }
 
-    fn id(&self) -> usize {
+    fn id(&self) -> &'static str {
         self.unibox.id()
     }
 }

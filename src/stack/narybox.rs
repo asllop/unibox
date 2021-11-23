@@ -12,18 +12,24 @@ use super::Buffer;
 pub struct UniBoxN<B: Buffer> {
     data: B,
     len: usize,
-    alig: usize,
     autodrop: fn(&Self),
-    id: usize
+    id: &'static str
 }
 
 impl<B: Buffer> UniBoxN<B> {
     /// Create a new UniBox instance.
     /// 
+    /// Returns Err if the struct is bigger than N bytes (N being the size of the unibox).
+    pub fn new<T: Sized>(instance: T) -> Result<Self, ()> {
+        Self::new_with_id(instance, core::any::type_name::<T>())
+    }
+
+    /// Create a new UniBox instance.
+    /// 
     /// Accepts an *instance* and an *id*: a custom defined identifier used to know what type lies inside.
     /// 
     /// Returns Err if the struct is bigger than N bytes (N being the size of the unibox).
-    pub fn new<T: Sized>(instance: T, id: usize) -> Result<Self, ()> {
+    pub fn new_with_id<T: Sized>(instance: T, id: &'static str) -> Result<Self, ()> {
         let bytes = unsafe {
             slice::from_raw_parts(
                 (&instance as *const T) as *const u8,
@@ -45,7 +51,6 @@ impl<B: Buffer> UniBoxN<B> {
                 Self {
                     data,
                     len,
-                    alig: mem::align_of::<T>(),
                     autodrop,
                     id
                 }
@@ -75,7 +80,7 @@ impl<B: Buffer> UniBoxN<B> {
     }
 
     /// Type identifier.
-    pub fn id(&self) -> usize {
+    pub fn id(&self) -> &'static str {
         self.id
     }
 
@@ -83,12 +88,15 @@ impl<B: Buffer> UniBoxN<B> {
         ptr::read(self.data.ptr() as *const T)
     }
 
-    fn integrity_checks<T>(&self) {
+    pub fn check_type<T>(&self) -> bool {
         let len = mem::size_of::<T>();
-        let alig = mem::align_of::<T>();
         // Integrity checks
-        if len != self.len || alig != self.alig {
-            panic!("Size or align of hosted and requiered types are different");
+        len == self.len && self.id == core::any::type_name::<T>()
+    }
+
+    fn integrity_checks<T>(&self) {
+        if !self.check_type::<T>() {
+            panic!("Hosted and requiered types are different");
         }
     }
 }

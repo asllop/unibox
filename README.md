@@ -98,20 +98,41 @@ for ubox in v.iter() {
 
 The dynamic version, `UniBox`, works exactly in the same way, the only difference is that it allocates memory to store the type and thus, you don't have to worry about the size.
 
+## Uniboxing types with references
+
+Is possible to unibox a type that contains a reference with non-static lifetime, like so:
+
+```rust
+struct MyStruct<'a> {
+    my_ref: &'a [i32]
+}
+
+let arr = [1, 2, 3, 4, 5];
+
+let ubox = UniBox32::new(
+    MyStruct {
+        my_ref: &arr
+    }
+).expect("Failed uniboxing MyStruct");
+
+println!("{:#?}", unsafe { ubox.as_ref::<MyStruct>() }.my_ref);
+```
+
+But once the type is embedded inside a UniBox, the rust compiler looses track of it, and it won't be able to ensure that lifetime constraints are observed. For this reason, is the programmer who must make sure that no references are used after being droped the original value. That's the main reason why `Uniboxed::as_ref` and `Uniboxed::as_mut_ref` are unsafe.
+
 ## Why not `Any`?
 
 The [`Any`](https://doc.rust-lang.org/std/any/trait.Any.html) trait exposes a similar functionality, it allows a generic type to be casted, but it has some limitations compared to uniboxes:
 
 1. Only types with static references can be used, so something like the following can't be allocated inside a `Box<dyn Any>`:
 
-```
+```rust
 struct MyStruct<'a> {
     my_ref: &'a [i32]
 }
 ```
 
 2. The size of a `dyn Any` can't be known at compile time, and thus, we can't use it to store generic types inside arrays or other non-heap memory artifacts.
-
 
 ## Features and `no_std`
 

@@ -87,15 +87,12 @@ fn _main() {
 }
 
 fn main() {
-    const ADDR_ID : usize = 1;
-    const USER_ID : usize = 2;
-
     println!("Size of User {}", std::mem::size_of::<User>());
     println!("Size of Address {}", std::mem::size_of::<Address>());
     println!("Align of User {}", std::mem::align_of::<User>());
     println!("Align of Address {}", std::mem::align_of::<Address>());
 
-    let ub1 = UniBox128::new_with_id(
+    let ub1 = UniBox128::new(
         User {
             name: "Andreu".to_owned(),
             surname: "Llop".to_owned(),
@@ -107,19 +104,17 @@ fn main() {
                 zip: 888888,
                 country_code: ['A' as u8, 'D' as u8]
             }
-        },
-        USER_ID
+        }
     ).expect("Couldn't create UniBox128 for User");
     
-    let ub2 = UniBox128::new_with_id(
+    let ub2 = UniBox128::new(
         Address {
             street: "Sense Nom".to_owned(),
             number: 666,
             city: "Infern".to_owned(),
             zip: 55555,
             country_code: ['C' as u8, 'T' as u8]
-        },
-        ADDR_ID
+        }
     ).expect("Couldn't create UniBox128 for Address");
 
     let user_ref = unsafe { ub1.as_ref::<User>() };
@@ -136,6 +131,7 @@ fn main() {
 
     for b in v.iter() {
         println!("UniBox len = {}", b.len());
+        println!("UniBox type = {}", b.id());
     }
 
     println!("---- Create 64 bytes unibox ----");
@@ -199,6 +195,12 @@ User {
         Custom(u8, u8, u8)
     }
 
+    impl Drop for Color {
+        fn drop(&mut self) {
+            println!("Color dropped");
+        }
+    }
+
     let ub6 = UniBox32::new(Color::Blue).expect("Failed uniboxing Color");
     println!("{:#?}", unsafe { ub6.as_ref::<Color>() });
     let ub6 = UniBox32::new(Color::Custom(0,100,200)).expect("Failed uniboxing Color");
@@ -220,6 +222,36 @@ User {
 
     let ub9 = UniBox32::new(true).expect("Failed uniboxing bool");
     println!("{:#?}", unsafe { ub9.as_ref::<bool>() });
+
+    println!("---- Struct with lifetime ----");
+
+    #[derive(Debug)]
+    struct MyStruct<'a> {
+        color_ref: &'a Box<Color>
+    }
+
+    let my_color = Box::new(Color::Red);
+
+    let ub10 = UniBox32::new(
+        MyStruct {
+            color_ref: &my_color
+        }
+    ).expect("Failed uniboxing MyStruct");
+
+    println!("{:#?}", unsafe { ub10.as_ref::<MyStruct>() });
+    
+    core::mem::drop(my_color);
+
+    // We droped my_color. Now ub10.as_ref::<MyStruct>() can't be used anymore, or we can crash the app.
+
+    /*
+    // Put some garbage in the heap.
+    let _x = Box::new("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+    let _y = Box::new("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
+    let _z = Box::new("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz");
+
+    println!("{:#?}", unsafe { ub10.as_ref::<MyStruct>() });
+    */
 
     println!("---- Finish and drop all ----");
 }
