@@ -1,7 +1,7 @@
 /// Interface for supported buffer types.
 /// 
 /// The internal buffer of all uniboxes must implement this trait.
-pub trait Buffer {
+pub unsafe trait Buffer {
     /// Init the type.
     fn init() -> Self;
     /// Raw pointer to type.
@@ -12,7 +12,7 @@ pub trait Buffer {
     fn copy_from_type(&mut self, src: &Self, len: usize);
 }
 
-impl Buffer for [u8; 32] {
+unsafe impl Buffer for [u8; 32] {
     fn init() -> Self {
         [0; 32]
     }
@@ -30,7 +30,7 @@ impl Buffer for [u8; 32] {
     }
 }
 
-impl Buffer for [u8; 64] {
+unsafe impl Buffer for [u8; 64] {
     fn init() -> Self {
         [0; 64]
     }
@@ -48,7 +48,7 @@ impl Buffer for [u8; 64] {
     }
 }
 
-impl Buffer for [u8; 128] {
+unsafe impl Buffer for [u8; 128] {
     fn init() -> Self {
         [0; 128]
     }
@@ -66,7 +66,7 @@ impl Buffer for [u8; 128] {
     }
 }
 
-impl Buffer for [u8; 256] {
+unsafe impl Buffer for [u8; 256] {
     fn init() -> Self {
         [0; 256]
     }
