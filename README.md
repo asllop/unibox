@@ -117,15 +117,14 @@ But once the type is embedded inside a UniBox, the rust compiler looses track of
 
 The [`Any`](https://doc.rust-lang.org/std/any/trait.Any.html) trait exposes a similar functionality, it allows a generic type to be casted, but it has some limitations compared to uniboxes:
 
-1. Only types with static references can be used, so something like the following can't be allocated inside a `Box<dyn Any>`:
+1. The size of a `dyn Any` can't be known at compile time, and thus, we can't use it to store generic types inside arrays or other non-heap memory artifacts. 
+2. Only types with static references can be used, so something like the following can't be allocated inside a `Box<dyn Any>`:
 
 ```rust
 struct MyStruct<'a> {
     my_ref: &'a [i32]
 }
 ```
-
-2. The size of a `dyn Any` can't be known at compile time, and thus, we can't use it to store generic types inside arrays or other non-heap memory artifacts.
 
 ## Features and `no_std`
 
